@@ -1,0 +1,197 @@
+{
+  "source_file": "data/raw/air-pollution-concentration.xlsx",
+  "unit": "mg/m3",
+  "conversion": "ug/m3 = mg/m3 * 1000",
+  "rows_monthly": 296,
+  "start_month": "2002-02-01",
+  "end_month": "2026-09-01",
+  "missing": {
+    "PM10": 83,
+    "PM2.5": 103,
+    "SO2": 0
+  },
+  "observed": {
+    "PM10": 213,
+    "PM2.5": 193,
+    "SO2": 296
+  },
+  "weather_features_used": false,
+  "validation": "Rolling-origin one-step-ahead backtest on last 18 observed months; training uses only dates before each test month.",
+  "feature_policy": "Forward-fill past values only; no backward fill or two-sided interpolation.",
+  "model_metrics": {
+    "PM10": {
+      "validation_start": "2025-04-01",
+      "validation_end": "2026-09-01",
+      "actual_unit": "mg/m3",
+      "metrics": {
+        "ridge": {
+          "n": 18,
+          "mae_mg_m3": 0.014869757602409625,
+          "rmse_mg_m3": 0.018514216919622423,
+          "r2": 0.4198354086635798,
+          "mae_ug_m3": 14.869757602409624,
+          "rmse_ug_m3": 18.514216919622424
+        },
+        "random_forest": {
+          "n": 18,
+          "mae_mg_m3": 0.017844870661833587,
+          "rmse_mg_m3": 0.020439423521052724,
+          "r2": 0.29290493017886554,
+          "mae_ug_m3": 17.844870661833586,
+          "rmse_ug_m3": 20.439423521052724
+        },
+        "xgboost": {
+          "n": 18,
+          "mae_mg_m3": 0.020783735909064613,
+          "rmse_mg_m3": 0.02345895898659155,
+          "r2": 0.06855332707819806,
+          "mae_ug_m3": 20.783735909064614,
+          "rmse_ug_m3": 23.45895898659155
+        },
+        "seasonal_naive": {
+          "n": 18,
+          "mae_mg_m3": 0.021594444444444444,
+          "rmse_mg_m3": 0.026131685747383386,
+          "r2": -0.15578053882207255,
+          "mae_ug_m3": 21.594444444444445,
+          "rmse_ug_m3": 26.131685747383386
+        },
+        "three_year_seasonal_mean": {
+          "n": 18,
+          "mae_mg_m3": 0.017470370370370372,
+          "rmse_mg_m3": 0.021019978738639093,
+          "r2": 0.25216623707859853,
+          "mae_ug_m3": 17.47037037037037,
+          "rmse_ug_m3": 21.019978738639093
+        },
+        "mean_2022_2025_same_month": {
+          "n": 18,
+          "mae_mg_m3": 0.01823425925925926,
+          "rmse_mg_m3": 0.02216511011661078,
+          "r2": 0.16846542794227604,
+          "mae_ug_m3": 18.234259259259257,
+          "rmse_ug_m3": 22.16511011661078
+        }
+      }
+    },
+    "PM2.5": {
+      "validation_start": "2025-03-01",
+      "validation_end": "2026-08-01",
+      "actual_unit": "mg/m3",
+      "metrics": {
+        "ridge": {
+          "n": 18,
+          "mae_mg_m3": 0.01114852500922416,
+          "rmse_mg_m3": 0.012470832886996555,
+          "r2": 0.5979873445483032,
+          "mae_ug_m3": 11.14852500922416,
+          "rmse_ug_m3": 12.470832886996556
+        },
+        "random_forest": {
+          "n": 18,
+          "mae_mg_m3": 0.00641615005765252,
+          "rmse_mg_m3": 0.010509611443869851,
+          "r2": 0.7144894731500523,
+          "mae_ug_m3": 6.41615005765252,
+          "rmse_ug_m3": 10.50961144386985
+        },
+        "xgboost": {
+          "n": 18,
+          "mae_mg_m3": 0.008400148726503055,
+          "rmse_mg_m3": 0.009180807997864412,
+          "r2": 0.7821233868524792,
+          "mae_ug_m3": 8.400148726503055,
+          "rmse_ug_m3": 9.180807997864411
+        },
+        "seasonal_naive": {
+          "n": 18,
+          "mae_mg_m3": 0.007249999999999999,
+          "rmse_mg_m3": 0.011508909592137736,
+          "r2": 0.6576130819164352,
+          "mae_ug_m3": 7.249999999999998,
+          "rmse_ug_m3": 11.508909592137735
+        },
+        "three_year_seasonal_mean": {
+          "n": 18,
+          "mae_mg_m3": 0.007835185185185188,
+          "rmse_mg_m3": 0.013926599914738172,
+          "r2": 0.498652325942454,
+          "mae_ug_m3": 7.835185185185188,
+          "rmse_ug_m3": 13.926599914738173
+        },
+        "mean_2022_2025_same_month": {
+          "n": 18,
+          "mae_mg_m3": 0.007755092592592593,
+          "rmse_mg_m3": 0.0136902544581768,
+          "r2": 0.5155244699536975,
+          "mae_ug_m3": 7.755092592592593,
+          "rmse_ug_m3": 13.690254458176799
+        }
+      }
+    },
+    "SO2": {
+      "validation_start": "2025-04-01",
+      "validation_end": "2026-09-01",
+      "actual_unit": "mg/m3",
+      "metrics": {
+        "ridge": {
+          "n": 18,
+          "mae_mg_m3": 0.010061046037663415,
+          "rmse_mg_m3": 0.015080819080030963,
+          "r2": -0.2516727613627203,
+          "mae_ug_m3": 10.061046037663415,
+          "rmse_ug_m3": 15.080819080030963
+        },
+        "random_forest": {
+          "n": 18,
+          "mae_mg_m3": 0.0122227319171185,
+          "rmse_mg_m3": 0.021526812070040303,
+          "r2": -1.5503534941136379,
+          "mae_ug_m3": 12.2227319171185,
+          "rmse_ug_m3": 21.526812070040304
+        },
+        "xgboost": {
+          "n": 18,
+          "mae_mg_m3": 0.009224263042791024,
+          "rmse_mg_m3": 0.015569777095332528,
+          "r2": -0.33415329033782504,
+          "mae_ug_m3": 9.224263042791025,
+          "rmse_ug_m3": 15.569777095332528
+        },
+        "seasonal_naive": {
+          "n": 18,
+          "mae_mg_m3": 0.016594444444444446,
+          "rmse_mg_m3": 0.0307084226593002,
+          "r2": -4.189863797948611,
+          "mae_ug_m3": 16.594444444444445,
+          "rmse_ug_m3": 30.7084226593002
+        },
+        "three_year_seasonal_mean": {
+          "n": 18,
+          "mae_mg_m3": 0.020977777777777776,
+          "rmse_mg_m3": 0.03579512691849424,
+          "r2": -6.051617628673771,
+          "mae_ug_m3": 20.977777777777774,
+          "rmse_ug_m3": 35.79512691849424
+        },
+        "mean_2022_2025_same_month": {
+          "n": 18,
+          "mae_mg_m3": 0.022473148148148145,
+          "rmse_mg_m3": 0.03764214500060953,
+          "r2": -6.798115586254502,
+          "mae_ug_m3": 22.473148148148145,
+          "rmse_ug_m3": 37.64214500060953
+        }
+      }
+    }
+  },
+  "selected_forecast_methods": {
+    "PM10": "ridge",
+    "PM2.5": "random_forest",
+    "SO2": "xgboost"
+  },
+  "forecast_horizon_months": 12,
+  "forecast_start": "2026-10-01",
+  "forecast_end": "2027-09-01",
+  "forecast_note": "Forecasts are model estimates, not observed measurements. Future values are recursive for ML models. No weather or station-level features are included. Forecast CSV includes original mg/m3 and converted ug/m3. Selection is based on lowest MAE in the same rolling-origin backtest; this may be optimistic because the same window is used for selection."
+}
