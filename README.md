@@ -1,61 +1,454 @@
-# Ulaanbaatar Air Pollution Prediction — v2
+# Улаанбаатар хотын агаарын бохирдлын таамаглал --- v2
 
-This project forecasts monthly PM10, PM2.5 and SO2 concentrations from the Data.mn workbook. The maintained entry point is `src/train_predict.py`; it is the single pipeline that creates the metrics, forecasts, intervals, audit files and figures.
+Энэхүү төсөл нь Data.mn эх сурвалжаас авсан өгөгдлийг ашиглан
+Улаанбаатар хотын агаарын бохирдлын сарын агууламжийг машин сургалтын
+аргаар таамаглана. Таамаглах үндсэн үзүүлэлтүүд нь PM10, PM2.5 болон SO2
+юм.
 
-## What the pipeline does
+Төслийн үндсэн ажиллагааг `src/train_predict.py` файл удирдана. Энэ нь
+өгөгдөл унших, боловсруулах, загвар сургах, үнэлэх, ирэх 12 сарын
+прогноз гаргах, прогнозын интервал тооцоолох, аудитын мэдээлэл болон
+график үүсгэх бүх үйл явцыг нэг нэгдсэн pipeline хэлбэрээр гүйцэтгэнэ.
 
-- Reads the `English` worksheet from Excel, or a CSV with `month`, `PM10`, `PM2.5` and `SO2` columns.
-- Keeps nonnegative values and forward-fills past values only when constructing lag features.
-- Compares raw Ridge, log-target Ridge, Random Forest, XGBoost (when installed), seasonal naive and three-year seasonal mean models.
-- Uses up to 60 rolling-origin validation points by default. The earliest third selects the model; later origins calibrate prediction intervals after a 12-month target-window embargo, so selection and calibration target months do not overlap. Set a different limit with `--max-validation-origins`.
-- Keeps the latest 12 calendar months for each pollutant out of tuning, model selection and interval calibration. It reports one-step and fixed-origin recursive holdout performance separately.
-- Reports performance and model-selection stability independently for PM10, PM2.5 and SO2. Stability includes per-origin MAE, mean and standard deviation of MAE, winner frequency and average rank.
-- Calibrates empirical intervals separately by forecast horizon. If forecasting must bridge elapsed months between the last observation and the next future calendar month, the interval uses calibration errors at the corresponding extended horizon so bridge forecast error is included.
-- Builds CSV, JSON and PNG outputs from the same in-memory run.
+## 1. Системийн үндсэн ажиллагаа
 
-## Setup
+Pipeline нь дараах үйлдлүүдийг гүйцэтгэнэ:
 
-```bash
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+-   Excel файлын `English` нэртэй worksheet-ээс өгөгдөл унших эсвэл
+    `month`, `PM10`, `PM2.5`, `SO2` баганатай CSV файл ашиглах.
+-   Сөрөг утгуудыг хасах.
+-   Lag Feature үүсгэх үед зөвхөн өмнөх хугацааны утгуудыг ашиглан
+    Forward Fill хийх.
+-   Дараах загваруудын үр дүнг харьцуулах:
+    -   Ridge Regression (түүхий зорилтот утгатай)
+    -   Log-target Ridge Regression
+    -   Random Forest
+    -   XGBoost (суулгасан тохиолдолд)
+    -   Seasonal Naive
+    -   Three-year Seasonal Mean
+-   Анхдагч тохиргоогоор хамгийн ихдээ 60 Rolling-origin Validation цэг
+    ашиглах.
+-   Validation цэгүүдийн эхний гуравны нэгийг загвар сонгоход, үлдсэн
+    хэсгийг прогнозын интервалын калибровк хийхэд ашиглах.
+-   Загвар сонголт болон калибровкийн зорилтот 12 сарын цонх давхцахаас
+    сэргийлж 12 сарын Target-window Embargo хэрэглэх.
+-   `--max-validation-origins` параметрээр Validation цэгийн дээд
+    хязгаарыг өөрчлөх.
+-   Хамгийн сүүлийн 12 календарь сарыг загвар тохируулах, сонгох болон
+    интервалын калибровкоос тусгаарлан Holdout өгөгдөл болгон хадгалах.
+-   One-step Holdout болон Fixed-origin Recursive Holdout гүйцэтгэлийг
+    тус тусад нь тайлагнах.
+-   PM10, PM2.5 болон SO2 үзүүлэлт бүрийн гүйцэтгэл, загвар сонголтын
+    тогтвортой байдлыг тусад нь үнэлэх.
+-   Загварын тогтвортой байдлыг Origin бүрийн MAE, MAE-ийн дундаж ба
+    стандарт хазайлт, Winner Frequency болон Average Rank үзүүлэлтээр
+    тооцох.
+-   Прогнозын хугацаа бүрд тусад нь эмпирик интервалын калибровк хийх.
+-   Сүүлийн бодит өгөгдлийн сар болон дараагийн ирээдүйн календарь сар
+    хооронд завсар байвал тухайн завсрын прогнозын алдааг интервалын
+    тооцоонд хамруулах.
+-   CSV, JSON болон PNG үр дүнг нэг удаагийн ажиллуулалтаар, ижил дотоод
+    өгөгдөл болон үр дүнд үндэслэн үүсгэх.
 
-## Run
+## 2. Өгөгдлийн эх үүсвэр ба бүтэц
 
-From the project folder:
+Систем нь дараах хоёр төрлийн оролтын файлыг дэмжинэ:
 
-```bash
-python src/train_predict.py --input-unit mg/m3
-```
+1.  Excel файл --- `English` нэртэй worksheet-тэй байх.
+2.  CSV файл --- дараах багануудыг агуулсан байх:
 
-The input unit can also be set to `ug/m3`. The default `auto` mode is only a scale heuristic; confirm the workbook's unit metadata where possible. For example:
+  Багана    Тайлбар
+  --------- --------------------------------
+  `month`   Хэмжилт хийгдсэн сар
+  `PM10`    PM10 агууламж
+  `PM2.5`   PM2.5 агууламж
+  `SO2`     Хүхрийн давхар ислийн агууламж
 
-```bash
-python src/train_predict.py --input data/raw/air-pollution-concentration.xlsx --out results --models-dir models --input-unit mg/m3 --max-validation-origins 60
-```
+Өгөгдөл нь сарын давтамжтай байна. PM10, PM2.5 болон SO2 үзүүлэлт тус
+бүрт тусдаа прогнозын загвар сонгож, үнэлгээ хийдэг.
 
-## Main outputs
+### 2.1 Хэмжих нэгж
 
-- `results/analysis_summary.json` — data audit, methodology, selected methods, validation/calibration split, interval diagnostics, holdout scores and model-stability summaries for each pollutant.
-- `results/model_metrics.csv` — validation, calibration and holdout metrics.
-- `results/model_stability.csv` — per-origin scores and ranks for each method and pollutant.
-- `results/forecast_12_months.csv` — selected 12-month forecast by pollutant.
-- `results/forecast_scenarios.csv` — forecasts from every candidate method.
-- `results/forecast_intervals.csv` — empirical interval, calibration horizon and sample diagnostics for each forecast month. Missing intervals are left blank when that horizon has no calibration residuals.
-- `results/recursive_validation_PM10.csv`, `recursive_validation_PM25.csv`, `recursive_validation_SO2.csv` — model-selection predictions by origin and horizon.
-- `results/interval_calibration_PM10.csv`, `interval_calibration_PM25.csv`, `interval_calibration_SO2.csv` — separate calibration predictions and absolute errors.
-- `results/recursive_holdout_*.csv`, `one_step_holdout_*.csv` — final holdout predictions.
-- `results/clean_monthly_data.csv` — cleaned, monthly source series in µg/m³.
-- `results/forecast_PM10.png`, `forecast_PM25.png`, `forecast_SO2.png`, `model_comparison.png`, `horizon_error_comparison.png` — figures generated in the same run.
-- `models/*.joblib` — final fitted ML pipelines.
+Систем дараах нэгжүүдийг дэмждэг:
 
-## Interpretation
+-   `mg/m3` --- миллиграмм/м³
+-   `ug/m3` --- микрограмм/м³
+-   `auto` --- утгын хэмжээнд үндэслэн нэгжийг автоматаар таамаглах
+    горим
 
-The interval columns are empirical calibration intervals, not guaranteed future 95% coverage. Rolling-origin residuals may be dependent, and sparse horizons are explicitly flagged in the JSON and CSV. The final holdout is for reporting only and does not affect model choice or intervals. These series are short monthly aggregates; stability results should be read as evidence across the evaluated origins, not a guarantee of future performance. The models do not use weather or station-level predictors.
+Боловсруулсан сарын өгөгдөл `µg/m³` нэгжээр хадгалагдана. `auto` горим
+нь зөвхөн хэмжээсийн эвристик таамаглал тул боломжтой бол эх Excel/CSV
+файлын нэгжийн мета мэдээллийг шалгаж, `--input-unit` параметрийг
+тодорхой зааж өгөх хэрэгтэй.
 
+Хөрвүүлэлтийн хамаарал:
 
-Legacy outputs from the previous pipeline are preserved under `results/archive_pre_refresh/` and are not part of the current run's output manifest.
+`1 mg/m³ = 1000 µg/m³`
+
+## 3. Өгөгдөл боловсруулах
+
+Өгөгдлийг загварт оруулахын өмнө сарын хугацааны дарааллыг бэлтгэж,
+сөрөг утгуудыг хасна. Lag Feature байгуулах үед зөвхөн өмнөх хугацааны
+мэдээлэлд тулгуурлан Forward Fill хийнэ. Ингэснээр ирээдүйн утгыг
+өнгөрсөн үеийн шинжид ашиглах Data Leakage-ийн эрсдэлийг бууруулна.
+
+### 3.1 Lag Feature
+
+Lag Feature нь тухайн сарын агууламжийг таамаглахдаа өмнөх саруудын
+утгыг оролтын шинж болгон ашиглах арга юм. Жишээлбэл, өмнөх 1, 2, 3
+болон улирлын давтамжтай холбоотой хугацааны утгуудыг загварт оруулж
+болно.
+
+Ерөнхий хэлбэр:
+
+`X_t = [Y_(t-1), Y_(t-2), Y_(t-3), ...]`
+
+Энд `Y_t` нь тухайн сарын бохирдуулагчийн агууламж юм.
+
+### 3.2 Өгөгдлийн алдагдлаас сэргийлэх
+
+Цаг хугацааны өгөгдөлд ирээдүйн мэдээлэл сургалтын шинжид орох нь
+үнэлгээг бодит бус болгоно. Иймээс pipeline нь хугацааны дарааллыг
+хадгалж, өмнөх мэдээллээр дараагийн хугацааг таамаглах зарчмыг
+баримтална.
+
+## 4. Ашиглах прогнозын загварууд
+
+Pipeline нь дараах нэр дэвшигч загваруудыг харьцуулна.
+
+### 4.1 Ridge Regression
+
+Ridge Regression нь шугаман регрессийн загвар бөгөөд L2 регуляризаци
+ашиглан коэффициентүүдийг хязгаарлаж, хэт тохируулгын эрсдэлийг
+бууруулахад чиглэнэ. Энэ хувилбар нь зорилтот утгыг анхны масштабаар
+ашиглана.
+
+### 4.2 Log-target Ridge Regression
+
+Энэ хувилбар нь зорилтот утгад логарифмын хувиргалт хийж Ridge
+Regression сургана. Прогноз гаргасны дараа үр дүнг анхны хэмжээс рүү
+буцаана. Энэ арга нь утгуудын тархалт баруун тийш хазайсан эсвэл маш
+өндөр оргил утгуудтай үед ашигтай байж болно.
+
+### 4.3 Random Forest
+
+Random Forest нь олон шийдвэрийн модны үр дүнг нэгтгэдэг ансамбль
+алгоритм юм. Шугаман бус хамаарлыг загварчлах боломжтой боловч хугацааны
+дарааллыг өөрөө автоматаар ойлгохгүй тул хугацааны болон Lag шинжүүдийг
+ашиглана.
+
+### 4.4 XGBoost
+
+XGBoost нь Gradient Boosting зарчмаар ажилладаг бөгөөд өмнөх моддын
+алдааг дараагийн модоор бууруулахыг зорьдог. Энэ загварыг зөвхөн орчинд
+XGBoost сан суулгасан үед харьцуулалтад оруулна.
+
+### 4.5 Seasonal Naive
+
+Seasonal Naive нь тухайн сарын утгыг өмнөх жилийн ижил сарын утгаар
+таамагладаг суурь арга юм. Сарын улирлын давтамжийг харгалзан үзэх
+энгийн жишиг загвар болно.
+
+### 4.6 Three-year Seasonal Mean
+
+Энэ арга нь өмнөх гурван жилийн ижил сарын утгуудын дунджийг ашиглан
+прогноз гаргана. Ингэснээр зөвхөн нэг жилийн ижил сарын утгад
+тулгуурлахгүй.
+
+> Тайлбар: LSTM нь төслийн анхны ерөнхий тайлбарт дурдагдаж болох ч энэ
+> хувилбарын харьцуулалтын жагсаалтад хэрэгжүүлсэн загвар гэж заагаагүй.
+> Иймээс одоогийн pipeline-ийн ашиглаж буй загваруудын нэг гэж үзэхгүй.
+
+## 5. Rolling-origin Cross-Validation
+
+Цаг хугацааны өгөгдөлд энгийн санамсаргүй Train/Test хуваалт хийх нь
+ирээдүйн мэдээллийг сургалтад оруулах эрсдэлтэй. Тиймээс төсөл
+Rolling-origin Cross-Validation ашиглана.
+
+Энэ аргын үед загварыг тодорхой хугацаа хүртэлх өгөгдлөөр сургаж,
+түүнээс хойших хугацааг таамаглана. Дараагийн үнэлгээнд сургалтын
+хугацааг урагшлуулж, шинэчилсэн түүхэн өгөгдлөөр дахин үнэлнэ.
+
+### 5.1 Үнэлгээний цэгийн тоо
+
+Анхдагч тохиргоогоор хамгийн ихдээ 60 Rolling-origin Validation цэг
+ашиглана. Энэ хязгаарыг дараах параметрээр өөрчилж болно:
+
+`--max-validation-origins`
+
+### 5.2 Загвар сонголт ба интервалын калибровк
+
+Боломжит Validation цэгүүдийг хоёр зориулалтаар тусгаарлана:
+
+-   Эхний гуравны нэг хэсэг --- загвар сонгох.
+-   Үлдсэн хожуу үеийн хэсэг --- прогнозын интервалын калибровк хийх.
+
+Сонголт болон калибровкийн зорилтот 12 сарын цонх давхцахаас
+сэргийлэхийн тулд 12 сарын Target-window Embargo хэрэглэнэ. Энэ нь
+загвар сонголтод ашигласан зорилтот хугацаануудыг интервалын калибровкт
+дахин ашиглах эрсдэлийг бууруулах зорилготой.
+
+## 6. Holdout үнэлгээ
+
+Хамгийн сүүлийн 12 календарь сарыг тусдаа Holdout өгөгдөл болгон
+хадгална. Эдгээр өгөгдөл нь загварын тохируулга, загвар сонголт болон
+прогнозын интервалын калибровкт оролцохгүй. Holdout нь эцсийн тайлагнал,
+үнэлгээнд зориулагдана.
+
+Pipeline нь хоёр төрлийн Holdout үнэлгээ гаргана.
+
+### 6.1 One-step Holdout
+
+One-step үнэлгээнд сар бүрийн прогнозыг гаргахдаа тухайн үе хүртэл
+мэдэгдэж байгаа бодит өмнөх утгуудыг ашиглана. Энэ нь сар бүр шинэ бодит
+хэмжилт ирдэг нөхцөлийг дуурайлгана.
+
+### 6.2 Fixed-origin Recursive Holdout
+
+Recursive Holdout-д нэг эхлэх цэг тогтоож, дараагийн прогнозын утгуудыг
+өмнөх прогнозын утгуудтай хамт дараагийн алхамд ашиглана. Энэ нь эхлэх
+цэгээс хойш шинэ бодит хэмжилт байхгүй нөхцөлд олон сарын прогноз хэрхэн
+ажиллахыг үнэлнэ.
+
+## 7. Загварын гүйцэтгэлийн хэмжүүрүүд
+
+Загварын таамагласан утга болон бодит утгын зөрүүг дараах хэмжүүрүүдээр
+үнэлнэ.
+
+### 7.1 MAE --- Mean Absolute Error
+
+MAE нь бодит болон прогнозын утгын абсолют зөрүүний дундаж юм.
+
+`MAE = mean(|y - ŷ|)`
+
+MAE бага байх тусам прогнозын дундаж абсолют алдаа бага байна.
+
+### 7.2 RMSE --- Root Mean Squared Error
+
+RMSE нь алдааны квадратыг дундажлан квадрат язгуур авсан хэмжүүр юм.
+
+`RMSE = sqrt(mean((y - ŷ)^2))`
+
+Их хэмжээний алдаанд илүү мэдрэмтгий. RMSE бага байх нь сайн.
+
+### 7.3 MAPE --- Mean Absolute Percentage Error
+
+MAPE нь бодит утгатай харьцуулсан абсолют хувийн алдааны дундаж юм.
+
+`MAPE = mean(|(y - ŷ) / y|) × 100%`
+
+Бодит утга тэг эсвэл тэгт ойр үед MAPE тогтворгүй эсвэл тодорхойгүй
+болдог. Иймээс MAE, RMSE-тэй хамтад нь тайлбарлах шаардлагатай.
+
+## 8. Загварын тогтвортой байдлын үнэлгээ
+
+Нэг удаагийн бага алдаа нь загвар бүх хугацаанд тогтвортой ажиллана
+гэсэн баталгаа биш. Иймээс төсөл үнэлгээний Origin бүрийн үр дүнг
+хадгалж, загварын тогтвортой байдлыг тусад нь тайлагнана.
+
+Тогтвортой байдлын үзүүлэлтүүд:
+
+-   **Per-origin MAE:** Rolling-origin үнэлгээний цэг бүрийн MAE.
+-   **Mean MAE:** Origin бүрийн MAE-ийн дундаж.
+-   **Standard Deviation of MAE:** Origin бүрийн MAE хэр хэлбэлзэж
+    байгааг харуулах стандарт хазайлт.
+-   **Winner Frequency:** Тухайн загвар үнэлгээний цэгүүдэд хэдэн удаа
+    хамгийн бага алдаатай байсны давтамж.
+-   **Average Rank:** Үнэлгээний цэг бүрийн загварын эрэмбийн дундаж.
+    Дундаж эрэмбэ бага байх нь харьцангуй сайн байр эзэлж байсныг
+    илтгэнэ.
+
+Эдгээр үзүүлэлтийг PM10, PM2.5 болон SO2 тус бүрээр тооцно.
+
+## 9. Прогнозын интервал
+
+Pipeline нь зөвхөн нэг прогнозын утга бус, мөн прогнозын тодорхойгүй
+байдлыг илэрхийлэх эмпирик интервал тооцно.
+
+Интервалын калибровкт өмнөх Rolling-origin прогнозуудын абсолют алдааг
+ашиглана. Интервал нь бодит калибровкийн үлдэгдэлд тулгуурласан үнэлгээ
+бөгөөд ирээдүйн 95%-ийн хамрах хүрээг баталгаажуулсан баталгаа биш юм.
+
+### 9.1 Horizon-specific Calibration
+
+Прогнозын 1, 2, ... 12 дахь сар бүрийн алдааны мэдээллийг тусад нь авч
+үзнэ. Ингэснээр богино болон урт хугацааны прогнозын алдааны ялгааг
+интервалд тусгах боломжтой.
+
+### 9.2 Bridge Forecast
+
+Сүүлийн бодит өгөгдлийн сар болон дараагийн ирээдүйн календарь сарын
+хооронд завсар байвал прогнозын өмнө уг завсрын саруудыг тооцох
+шаардлага гарч болно.
+
+Ийм үед интервалын калибровк нь зөвхөн 12 сарын үндсэн горизонтыг бус,
+тухайн завсрыг нөхөхөд шаардлагатай сунгасан прогнозын горизонтыг
+харгалзана. Ингэснээр завсрын прогнозын алдааг интервалын тооцоонд
+хамруулна.
+
+### 9.3 Интервалын хязгаарлалт
+
+-   Эмпирик интервал нь ирээдүйн 95%-ийн хамрах хүрээг
+    баталгаажуулахгүй.
+-   Rolling-origin үлдэгдлүүд хоорондоо хамааралтай байж болно.
+-   Зарим прогнозын горизонтад калибровкийн үлдэгдэл хангалтгүй байж
+    болно.
+-   Үлдэгдэл байхгүй горизонтуудын интервалын утгыг хоосон үлдээж, JSON
+    болон CSV тайланд оношилгооны мэдээллийг тэмдэглэнэ.
+
+## 10. Үүсэх файлууд
+
+Pipeline ажилласны дараа `results/` болон `models/` хавтаснуудад дараах
+файлууд үүснэ.
+
+### 10.1 Үндсэн тайлан ба үнэлгээ
+
+  -----------------------------------------------------------------------
+  Файл                                Тайлбар
+  ----------------------------------- -----------------------------------
+  `results/analysis_summary.json`     Өгөгдлийн аудит, арга зүй, сонгосон
+                                      загвар, Validation/Calibration
+                                      хуваарилалт, интервалын оношилгоо,
+                                      Holdout үнэлгээ болон тогтвортой
+                                      байдлын хураангуй
+
+  `results/model_metrics.csv`         Validation, Calibration болон
+                                      Holdout үеийн загварын үнэлгээний
+                                      хэмжүүрүүд
+
+  `results/model_stability.csv`       Загвар бүрийн Origin тус бүрийн
+                                      оноо, эрэмбэ болон тогтвортой
+                                      байдлын мэдээлэл
+  -----------------------------------------------------------------------
+
+### 10.2 Прогнозын файлууд
+
+  -----------------------------------------------------------------------
+  Файл                                Тайлбар
+  ----------------------------------- -----------------------------------
+  `results/forecast_12_months.csv`    Бохирдуулагч тус бүрийн сонгогдсон
+                                      загварын 12 сарын прогноз
+
+  `results/forecast_scenarios.csv`    Нэр дэвшигч бүх загварын прогнозын
+                                      хувилбарууд
+
+  `results/forecast_intervals.csv`    Сар бүрийн эмпирик интервал,
+                                      калибровкийн горизонт болон
+                                      түүврийн оношилгоо
+  -----------------------------------------------------------------------
+
+### 10.3 Validation болон Calibration файлууд
+
+  -----------------------------------------------------------------------------
+  Файл                                      Тайлбар
+  ----------------------------------------- -----------------------------------
+  `results/recursive_validation_PM10.csv`   PM10-ийн загвар сонголтын Recursive
+                                            Validation прогнозууд
+
+  `results/recursive_validation_PM25.csv`   PM2.5-ийн загвар сонголтын
+                                            Recursive Validation прогнозууд
+
+  `results/recursive_validation_SO2.csv`    SO2-ийн загвар сонголтын Recursive
+                                            Validation прогнозууд
+
+  `results/interval_calibration_PM10.csv`   PM10-ийн интервалын калибровкийн
+                                            прогноз ба абсолют алдаа
+
+  `results/interval_calibration_PM25.csv`   PM2.5-ийн интервалын калибровкийн
+                                            прогноз ба абсолют алдаа
+
+  `results/interval_calibration_SO2.csv`    SO2-ийн интервалын калибровкийн
+                                            прогноз ба абсолют алдаа
+  -----------------------------------------------------------------------------
+
+### 10.4 Holdout файлууд
+
+  -----------------------------------------------------------------------
+  Файлын нэр                          Тайлбар
+  ----------------------------------- -----------------------------------
+  `results/recursive_holdout_*.csv`   Recursive Holdout прогнозын үр дүн
+
+  `results/one_step_holdout_*.csv`    One-step Holdout прогнозын үр дүн
+  -----------------------------------------------------------------------
+
+`*` тэмдэг нь PM10, PM25 эсвэл SO2 үзүүлэлтийн нэрийг орлоно.
+
+### 10.5 Цэвэрлэсэн өгөгдөл
+
+`results/clean_monthly_data.csv`
+
+Энэ файлд цэвэрлэж, сарын давтамжид оруулсан эх өгөгдөл `µg/m³` нэгжээр
+хадгалагдана.
+
+### 10.6 График дүрслэл
+
+  ----------------------------------------------------------------------------
+  Файл                                     Тайлбар
+  ---------------------------------------- -----------------------------------
+  `results/forecast_PM10.png`              PM10-ийн бодит өгөгдөл ба прогноз
+
+  `results/forecast_PM25.png`              PM2.5-ийн бодит өгөгдөл ба прогноз
+
+  `results/forecast_SO2.png`               SO2-ийн бодит өгөгдөл ба прогноз
+
+  `results/model_comparison.png`           Загваруудын гүйцэтгэлийн
+                                           харьцуулалт
+
+  `results/horizon_error_comparison.png`   Прогнозын хугацаа тус бүрийн
+                                           алдааны харьцуулалт
+  ----------------------------------------------------------------------------
+
+### 10.7 Сургагдсан загварууд
+
+`models/*.joblib`
+
+Энэ хавтаст эцсийн байдлаар сургагдсан машин сургалтын pipeline-уудыг
+Joblib форматаар хадгална.
+
+## 11. Үр дүнг тайлбарлахад анхаарах зүйлс
+
+Прогнозын үр дүнг тайлбарлахдаа дараах хязгаарлалтуудыг харгалзан үзнэ.
+
+1.  Прогнозын интервал нь эмпирик калибровкийн интервал бөгөөд ирээдүйн
+    95%-ийн хамрах хүрээг баталгаажуулахгүй.
+2.  Rolling-origin үлдэгдлүүд хоорондоо хамааралтай байж болно.
+3.  Зарим урт горизонтад калибровкийн түүвэр цөөн байж болох бөгөөд ийм
+    тохиолдлыг JSON болон CSV тайланд тэмдэглэнэ.
+4.  Эцсийн Holdout өгөгдөл нь зөвхөн тайлагнал, үнэлгээнд ашиглагдах
+    бөгөөд загвар сонголт болон интервалын калибровкт нөлөөлөхгүй.
+5.  Ашиглаж буй өгөгдөл нь сарын давтамжтай, харьцангуй цөөн ажиглалттай
+    цуваа тул тогтвортой байдлын үр дүнг зөвхөн үнэлсэн хугацааны
+    хүрээнд тайлбарлах хэрэгтэй.
+6.  Одоогийн загварууд цаг уурын болон хэмжилтийн станцын түвшний нэмэлт
+    хувьсагч ашиглахгүй.
+
+Иймээс прогнозын үр дүнг агаарын бохирдлын ирээдүйн өөрчлөлтийн талаарх
+тоон үнэлгээ, судалгааны дэмжих мэдээлэл гэж үзэх бөгөөд бодит ирээдүйн
+утгатай заавал тэнцэнэ гэж ойлгож болохгүй.
+
+## 12. Хуучин үр дүнгийн хадгалалт
+
+Өмнөх pipeline-аас үүссэн хуучин үр дүнгүүдийг:
+
+`results/archive_pre_refresh/`
+
+хавтаст хадгална.
+
+Эдгээр архивласан файлууд нь одоогийн pipeline-ийн ажиллуулалтаар үүссэн
+шинэ үр дүнгийн жагсаалтад хамаарахгүй.
+
+Одоогийн үр дүнг үнэлэхдээ `src/train_predict.py` файлын хамгийн сүүлийн
+ажиллуулалтаар үүссэн файлуудыг ашиглана.
+
+## 13. Төслийн ач холбогдол
+
+Энэхүү төсөл нь Улаанбаатар хотын агаарын бохирдлын PM10, PM2.5 болон
+SO2 үзүүлэлтүүдийн түүхэн мэдээлэлд үндэслэн ирэх 12 сарын өөрчлөлтийг
+таамаглах боломж олгоно.
+
+Олон төрлийн машин сургалтын болон улирлын суурь загварыг харьцуулж,
+хугацааны дарааллыг хадгалсан үнэлгээ хийснээр прогнозын чанар, загварын
+тогтвортой байдал, тодорхойгүй байдлыг хамтад нь судлах боломжтой.
+
+Гарсан үр дүнг агаарын чанарын судалгаа, цаашдын шинжилгээ болон
+төлөвлөлтийн шийдвэр гаргалтад туслах мэдээлэл болгон ашиглаж болно.
