@@ -1,14 +1,17 @@
 # Ulaanbaatar Air Pollution Prediction — v2
 
-## What this version does
-- Reads the `English` sheet from the Data.mn Excel file.
-- Uses PM10, PM2.5 and SO2 monthly observations.
-- Builds features from past observations only (forward-fill only; no two-sided interpolation).
-- Compares Ridge, Random Forest, XGBoost, Seasonal Naive, 3-year seasonal mean and 2022–2025 same-month mean.
-- Uses rolling-origin one-month-ahead backtesting on the last 18 observed months.
-- Reports MAE, RMSE and R². Metrics are exported in both mg/m³ and µg/m³.
-- Selects the lowest-MAE method separately for each pollutant and produces a 12-month forecast.
-- Saves fitted ML models as `.joblib` files.
+This project forecasts monthly PM10, PM2.5 and SO2 concentrations from the Data.mn workbook. The maintained entry point is `src/train_predict.py`; it is the single pipeline that creates the metrics, forecasts, intervals, audit files and figures.
+
+## What the pipeline does
+
+- Reads the `English` worksheet from Excel, or a CSV with `month`, `PM10`, `PM2.5` and `SO2` columns.
+- Keeps nonnegative values and forward-fills past values only when constructing lag features.
+- Compares raw Ridge, log-target Ridge, Random Forest, XGBoost (when installed), seasonal naive and three-year seasonal mean models.
+- Uses up to 60 rolling-origin validation points by default. The earliest third selects the model; later origins calibrate prediction intervals after a 12-month target-window embargo, so selection and calibration target months do not overlap. Set a different limit with `--max-validation-origins`.
+- Keeps the latest 12 calendar months for each pollutant out of tuning, model selection and interval calibration. It reports one-step and fixed-origin recursive holdout performance separately.
+- Reports performance and model-selection stability independently for PM10, PM2.5 and SO2. Stability includes per-origin MAE, mean and standard deviation of MAE, winner frequency and average rank.
+- Calibrates empirical intervals separately by forecast horizon. If forecasting must bridge elapsed months between the last observation and the next future calendar month, the interval uses calibration errors at the corresponding extended horizon so bridge forecast error is included.
+- Builds CSV, JSON and PNG outputs from the same in-memory run.
 
 ## Setup
 
@@ -21,32 +24,38 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Run from this project folder
+## Run
+
+From the project folder:
 
 ```bash
-python src/train_predict.py
+python src/train_predict.py --input-unit mg/m3
 ```
 
-Or specify paths:
+The input unit can also be set to `ug/m3`. The default `auto` mode is only a scale heuristic; confirm the workbook's unit metadata where possible. For example:
 
 ```bash
-python src/train_predict.py --input data/raw/air-pollution-concentration.xlsx --out results --models-dir models
+python src/train_predict.py --input data/raw/air-pollution-concentration.xlsx --out results --models-dir models --input-unit mg/m3 --max-validation-origins 60
 ```
 
-## Outputs
+## Main outputs
 
-- `results/analysis_summary.json` — data summary, model metrics and selected models.
-- `results/forecast_12_months.csv` — selected forecast per pollutant, original mg/m³ and converted µg/m³.
-- `results/forecast_scenarios.csv` — all model/scenario forecasts.
-- `results/forecast_ridge_model.csv` — Ridge-only forecast for comparison.
-- `results/backtest_PM10.csv`, `backtest_PM25.csv`, `backtest_SO2.csv` — actual vs one-step predictions for the test window.
-- `results/clean_monthly_data.csv` — cleaned monthly source data.
-- `models/*.joblib` — fitted Ridge, Random Forest and XGBoost pipelines.
+- `results/analysis_summary.json` — data audit, methodology, selected methods, validation/calibration split, interval diagnostics, holdout scores and model-stability summaries for each pollutant.
+- `results/model_metrics.csv` — validation, calibration and holdout metrics.
+- `results/model_stability.csv` — per-origin scores and ranks for each method and pollutant.
+- `results/forecast_12_months.csv` — selected 12-month forecast by pollutant.
+- `results/forecast_scenarios.csv` — forecasts from every candidate method.
+- `results/forecast_intervals.csv` — empirical interval, calibration horizon and sample diagnostics for each forecast month. Missing intervals are left blank when that horizon has no calibration residuals.
+- `results/recursive_validation_PM10.csv`, `recursive_validation_PM25.csv`, `recursive_validation_SO2.csv` — model-selection predictions by origin and horizon.
+- `results/interval_calibration_PM10.csv`, `interval_calibration_PM25.csv`, `interval_calibration_SO2.csv` — separate calibration predictions and absolute errors.
+- `results/recursive_holdout_*.csv`, `one_step_holdout_*.csv` — final holdout predictions.
+- `results/clean_monthly_data.csv` — cleaned, monthly source series in µg/m³.
+- `results/forecast_PM10.png`, `forecast_PM25.png`, `forecast_SO2.png`, `model_comparison.png`, `horizon_error_comparison.png` — figures generated in the same run.
+- `models/*.joblib` — final fitted ML pipelines.
 
-## Important interpretation notes
-- The source dataset contains monthly aggregate values in mg/m³. A conversion to µg/m³ is included (multiply by 1000).
-- The last 18 observed months are used for rolling-origin validation. For each test month, the model is fitted only on earlier months.
-- This is a small monthly dataset. Results should be interpreted cautiously; do not claim that any model is universally best based on one validation window.
-- The script does not use weather data, station-level data, or future meteorological forecasts.
-- If a pollutant has a missing latest month, the model forecasts from the dataset's overall final month and carries forward the last known value for lag construction. Check the `observed` and `missing` counts in `analysis_summary.json`.
-- The selected method is chosen by lowest MAE on the same rolling backtest window. For a more rigorous thesis, keep a separate validation window for model selection and a final untouched test window for final reporting.
+## Interpretation
+
+The interval columns are empirical calibration intervals, not guaranteed future 95% coverage. Rolling-origin residuals may be dependent, and sparse horizons are explicitly flagged in the JSON and CSV. The final holdout is for reporting only and does not affect model choice or intervals. These series are short monthly aggregates; stability results should be read as evidence across the evaluated origins, not a guarantee of future performance. The models do not use weather or station-level predictors.
+
+
+Legacy outputs from the previous pipeline are preserved under `results/archive_pre_refresh/` and are not part of the current run's output manifest.

@@ -1,197 +1,2339 @@
 {
-  "source_file": "data/raw/air-pollution-concentration.xlsx",
-  "unit": "mg/m3",
-  "conversion": "ug/m3 = mg/m3 * 1000",
-  "rows_monthly": 296,
-  "start_month": "2002-02-01",
-  "end_month": "2026-09-01",
-  "missing": {
-    "PM10": 83,
-    "PM2.5": 103,
-    "SO2": 0
+  "source_file": "data\\raw\\air-pollution-concentration.xlsx",
+  "source_units": {
+    "PM10": "mg/m3",
+    "PM2.5": "mg/m3",
+    "SO2": "mg/m3"
   },
-  "observed": {
-    "PM10": 213,
-    "PM2.5": 193,
-    "SO2": 296
-  },
-  "weather_features_used": false,
-  "validation": "Rolling-origin one-step-ahead backtest on last 18 observed months; training uses only dates before each test month.",
-  "feature_policy": "Forward-fill past values only; no backward fill or two-sided interpolation.",
-  "model_metrics": {
-    "PM10": {
-      "validation_start": "2025-04-01",
-      "validation_end": "2026-09-01",
-      "actual_unit": "mg/m3",
-      "metrics": {
-        "ridge": {
-          "n": 18,
-          "mae_mg_m3": 0.014869757602409625,
-          "rmse_mg_m3": 0.018514216919622423,
-          "r2": 0.4198354086635798,
-          "mae_ug_m3": 14.869757602409624,
-          "rmse_ug_m3": 18.514216919622424
-        },
-        "random_forest": {
-          "n": 18,
-          "mae_mg_m3": 0.017844870661833587,
-          "rmse_mg_m3": 0.020439423521052724,
-          "r2": 0.29290493017886554,
-          "mae_ug_m3": 17.844870661833586,
-          "rmse_ug_m3": 20.439423521052724
-        },
-        "xgboost": {
-          "n": 18,
-          "mae_mg_m3": 0.020783735909064613,
-          "rmse_mg_m3": 0.02345895898659155,
-          "r2": 0.06855332707819806,
-          "mae_ug_m3": 20.783735909064614,
-          "rmse_ug_m3": 23.45895898659155
-        },
-        "seasonal_naive": {
-          "n": 18,
-          "mae_mg_m3": 0.021594444444444444,
-          "rmse_mg_m3": 0.026131685747383386,
-          "r2": -0.15578053882207255,
-          "mae_ug_m3": 21.594444444444445,
-          "rmse_ug_m3": 26.131685747383386
-        },
-        "three_year_seasonal_mean": {
-          "n": 18,
-          "mae_mg_m3": 0.017470370370370372,
-          "rmse_mg_m3": 0.021019978738639093,
-          "r2": 0.25216623707859853,
-          "mae_ug_m3": 17.47037037037037,
-          "rmse_ug_m3": 21.019978738639093
-        },
-        "mean_2022_2025_same_month": {
-          "n": 18,
-          "mae_mg_m3": 0.01823425925925926,
-          "rmse_mg_m3": 0.02216511011661078,
-          "r2": 0.16846542794227604,
-          "mae_ug_m3": 18.234259259259257,
-          "rmse_ug_m3": 22.16511011661078
-        }
-      }
-    },
-    "PM2.5": {
-      "validation_start": "2025-03-01",
-      "validation_end": "2026-08-01",
-      "actual_unit": "mg/m3",
-      "metrics": {
-        "ridge": {
-          "n": 18,
-          "mae_mg_m3": 0.01114852500922416,
-          "rmse_mg_m3": 0.012470832886996555,
-          "r2": 0.5979873445483032,
-          "mae_ug_m3": 11.14852500922416,
-          "rmse_ug_m3": 12.470832886996556
-        },
-        "random_forest": {
-          "n": 18,
-          "mae_mg_m3": 0.00641615005765252,
-          "rmse_mg_m3": 0.010509611443869851,
-          "r2": 0.7144894731500523,
-          "mae_ug_m3": 6.41615005765252,
-          "rmse_ug_m3": 10.50961144386985
-        },
-        "xgboost": {
-          "n": 18,
-          "mae_mg_m3": 0.008400148726503055,
-          "rmse_mg_m3": 0.009180807997864412,
-          "r2": 0.7821233868524792,
-          "mae_ug_m3": 8.400148726503055,
-          "rmse_ug_m3": 9.180807997864411
-        },
-        "seasonal_naive": {
-          "n": 18,
-          "mae_mg_m3": 0.007249999999999999,
-          "rmse_mg_m3": 0.011508909592137736,
-          "r2": 0.6576130819164352,
-          "mae_ug_m3": 7.249999999999998,
-          "rmse_ug_m3": 11.508909592137735
-        },
-        "three_year_seasonal_mean": {
-          "n": 18,
-          "mae_mg_m3": 0.007835185185185188,
-          "rmse_mg_m3": 0.013926599914738172,
-          "r2": 0.498652325942454,
-          "mae_ug_m3": 7.835185185185188,
-          "rmse_ug_m3": 13.926599914738173
-        },
-        "mean_2022_2025_same_month": {
-          "n": 18,
-          "mae_mg_m3": 0.007755092592592593,
-          "rmse_mg_m3": 0.0136902544581768,
-          "r2": 0.5155244699536975,
-          "mae_ug_m3": 7.755092592592593,
-          "rmse_ug_m3": 13.690254458176799
-        }
-      }
-    },
-    "SO2": {
-      "validation_start": "2025-04-01",
-      "validation_end": "2026-09-01",
-      "actual_unit": "mg/m3",
-      "metrics": {
-        "ridge": {
-          "n": 18,
-          "mae_mg_m3": 0.010061046037663415,
-          "rmse_mg_m3": 0.015080819080030963,
-          "r2": -0.2516727613627203,
-          "mae_ug_m3": 10.061046037663415,
-          "rmse_ug_m3": 15.080819080030963
-        },
-        "random_forest": {
-          "n": 18,
-          "mae_mg_m3": 0.0122227319171185,
-          "rmse_mg_m3": 0.021526812070040303,
-          "r2": -1.5503534941136379,
-          "mae_ug_m3": 12.2227319171185,
-          "rmse_ug_m3": 21.526812070040304
-        },
-        "xgboost": {
-          "n": 18,
-          "mae_mg_m3": 0.009224263042791024,
-          "rmse_mg_m3": 0.015569777095332528,
-          "r2": -0.33415329033782504,
-          "mae_ug_m3": 9.224263042791025,
-          "rmse_ug_m3": 15.569777095332528
-        },
-        "seasonal_naive": {
-          "n": 18,
-          "mae_mg_m3": 0.016594444444444446,
-          "rmse_mg_m3": 0.0307084226593002,
-          "r2": -4.189863797948611,
-          "mae_ug_m3": 16.594444444444445,
-          "rmse_ug_m3": 30.7084226593002
-        },
-        "three_year_seasonal_mean": {
-          "n": 18,
-          "mae_mg_m3": 0.020977777777777776,
-          "rmse_mg_m3": 0.03579512691849424,
-          "r2": -6.051617628673771,
-          "mae_ug_m3": 20.977777777777774,
-          "rmse_ug_m3": 35.79512691849424
-        },
-        "mean_2022_2025_same_month": {
-          "n": 18,
-          "mae_mg_m3": 0.022473148148148145,
-          "rmse_mg_m3": 0.03764214500060953,
-          "r2": -6.798115586254502,
-          "mae_ug_m3": 22.473148148148145,
-          "rmse_ug_m3": 37.64214500060953
-        }
+  "model_and_output_unit": "ug/m3",
+  "monthly_data_audit": {
+    "source_rows": 296,
+    "invalid_month_rows_dropped": 0,
+    "duplicate_month_rows_dropped_keep_last": 0,
+    "monthly_index_start": "2002-02-01",
+    "monthly_index_end": "2026-09-01",
+    "monthly_rows_after_reindex": 296,
+    "unit_audit": {
+      "PM10": {
+        "source_unit": "mg/m3",
+        "output_unit": "ug/m3",
+        "conversion_factor": 1000.0,
+        "negative_values_set_missing": 0,
+        "nonnumeric_values_set_missing": 0,
+        "missing_values_after_month_reindex": 83,
+        "positive_median_in_source_unit": 0.1057,
+        "unit_auto_detection_is_heuristic": false
+      },
+      "PM2.5": {
+        "source_unit": "mg/m3",
+        "output_unit": "ug/m3",
+        "conversion_factor": 1000.0,
+        "negative_values_set_missing": 0,
+        "nonnumeric_values_set_missing": 0,
+        "missing_values_after_month_reindex": 103,
+        "positive_median_in_source_unit": 0.0375,
+        "unit_auto_detection_is_heuristic": false
+      },
+      "SO2": {
+        "source_unit": "mg/m3",
+        "output_unit": "ug/m3",
+        "conversion_factor": 1000.0,
+        "negative_values_set_missing": 0,
+        "nonnumeric_values_set_missing": 0,
+        "missing_values_after_month_reindex": 0,
+        "positive_median_in_source_unit": 0.01405,
+        "unit_auto_detection_is_heuristic": false
       }
     }
   },
-  "selected_forecast_methods": {
-    "PM10": "ridge",
-    "PM2.5": "random_forest",
-    "SO2": "xgboost"
+  "methodology": {
+    "one_step_validation": "Expanding-window rolling-origin: every prediction uses only observations before its target month.",
+    "recursive_validation": "At each origin, fit once using data through the origin; recursively forecast the next 12 calendar months.",
+    "model_selection": "Select model by mean origin-level MAE across the dedicated earlier selection origins; each origin contributes equally. Final holdout is never used for selection.",
+    "tuning": "GridSearchCV + TimeSeriesSplit on the pre-validation period only.",
+    "final_holdout": "Latest 12 calendar months are excluded from tuning and model selection; evaluate one-step and fixed-origin 12-step recursive forecasts separately.",
+    "prediction_intervals": "Horizon-specific absolute-error quantiles. Model-selection origins and later calibration origins are separated; each horizon uses only its own recursive forecast errors. Calibration count, empirical coverage and interval width are reported per horizon.",
+    "interval_caveat": "The configured minimum is a practical diagnostic threshold, not a guarantee. Rolling-origin errors can be serially dependent; calibration coverage is descriptive and does not guarantee future 95% coverage. Sparse samples are flagged and intervals are labeled empirical only.",
+    "forecast_date_policy": "Publish 12 months after the later of the last observed month and the current calendar month; recursively bridge any elapsed but unobserved months without presenting them as future forecasts.",
+    "SO2": "Inspect month-of-year seasonality and IQR/MAD outliers; compare raw Ridge, log1p Ridge and baselines; do not remove flagged outliers automatically.",
+    "units": "All calculations/outputs are ug/m3; 1 mg/m3 = 1000 ug/m3. Auto unit detection is a scale heuristic, not proof of source units.",
+    "MAPE": "MAPE excludes near-zero actual values; interpret MAE, RMSE, sMAPE and WAPE alongside it."
+  },
+  "weather_features_used": false,
+  "target_results": {
+    "PM10": {
+      "observed_month_count": 213,
+      "first_observed_month": "2008-12-01",
+      "last_observed_month": "2026-09-01",
+      "forecast_bridge_months_skipped_from_output": 2,
+      "forecast_start": "2026-12-01",
+      "validation_origins": [
+        "2021-10-01",
+        "2021-11-01",
+        "2021-12-01",
+        "2022-01-01",
+        "2022-02-01",
+        "2022-03-01",
+        "2022-04-01",
+        "2022-05-01",
+        "2022-06-01",
+        "2022-07-01",
+        "2022-08-01",
+        "2022-09-01",
+        "2022-10-01",
+        "2022-11-01",
+        "2022-12-01",
+        "2023-01-01",
+        "2023-02-01",
+        "2023-03-01",
+        "2023-04-01",
+        "2023-05-01",
+        "2023-06-01",
+        "2023-07-01",
+        "2023-08-01",
+        "2023-09-01",
+        "2023-10-01",
+        "2023-11-01",
+        "2023-12-01",
+        "2024-01-01",
+        "2024-02-01",
+        "2024-03-01",
+        "2024-04-01",
+        "2024-05-01",
+        "2024-06-01",
+        "2024-07-01",
+        "2024-08-01",
+        "2024-09-01"
+      ],
+      "validation_origin_count": 36,
+      "selection_origin_count_requested": 6,
+      "max_validation_origins_requested": 36,
+      "model_selection_origins": [
+        "2021-10-01",
+        "2021-11-01",
+        "2021-12-01",
+        "2022-01-01",
+        "2022-02-01",
+        "2022-03-01"
+      ],
+      "model_selection_origin_count": 6,
+      "interval_calibration_origins": [
+        "2022-04-01",
+        "2022-05-01",
+        "2022-06-01",
+        "2022-07-01",
+        "2022-08-01",
+        "2022-09-01",
+        "2022-10-01",
+        "2022-11-01",
+        "2022-12-01",
+        "2023-01-01",
+        "2023-02-01",
+        "2023-03-01",
+        "2023-04-01",
+        "2023-05-01",
+        "2023-06-01",
+        "2023-07-01",
+        "2023-08-01",
+        "2023-09-01",
+        "2023-10-01",
+        "2023-11-01",
+        "2023-12-01",
+        "2024-01-01",
+        "2024-02-01",
+        "2024-03-01",
+        "2024-04-01",
+        "2024-05-01",
+        "2024-06-01",
+        "2024-07-01",
+        "2024-08-01",
+        "2024-09-01"
+      ],
+      "interval_calibration_origin_count": 30,
+      "bridge_month_count": 2,
+      "calibration_horizon_months": 14,
+      "model_stability_by_method": {
+        "random_forest": {
+          "method": "random_forest",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 18.552798792795688,
+          "std_origin_mae_ug_m3": 3.1027703382601786,
+          "mean_origin_rank": 3.6666666666666665,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.1672400144535081,
+          "target": "PM10"
+        },
+        "ridge_log": {
+          "method": "ridge_log",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 10.015011194616308,
+          "std_origin_mae_ug_m3": 2.3301910798763648,
+          "mean_origin_rank": 1.6666666666666667,
+          "best_rank_count": 2,
+          "origin_mae_cv": 0.23266984275853705,
+          "target": "PM10"
+        },
+        "ridge_raw": {
+          "method": "ridge_raw",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 20.169494402123515,
+          "std_origin_mae_ug_m3": 1.2866777427984333,
+          "mean_origin_rank": 4.5,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.06379325714099048,
+          "target": "PM10"
+        },
+        "seasonal_naive": {
+          "method": "seasonal_naive",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 18.85,
+          "std_origin_mae_ug_m3": 0.5240335018976475,
+          "mean_origin_rank": 3.8333333333333335,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.027800185777063526,
+          "target": "PM10"
+        },
+        "three_year_seasonal_mean": {
+          "method": "three_year_seasonal_mean",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 8.361111111111109,
+          "std_origin_mae_ug_m3": 0.7703294148657506,
+          "mean_origin_rank": 1.3333333333333333,
+          "best_rank_count": 4,
+          "origin_mae_cv": 0.09213242171151836,
+          "target": "PM10"
+        },
+        "xgboost": {
+          "method": "xgboost",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 37.97913943396674,
+          "std_origin_mae_ug_m3": 3.8227422553211525,
+          "mean_origin_rank": 6.0,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.10065373550571483,
+          "target": "PM10"
+        }
+      },
+      "final_holdout_start": "2025-10-01",
+      "final_holdout_end": "2026-09-01",
+      "selected_method_by_mean_origin_mae": "three_year_seasonal_mean",
+      "selected_method_by_recursive_validation_mae": "three_year_seasonal_mean",
+      "tuning": {
+        "ridge_raw": {
+          "best_params": {
+            "model__alpha": 50.0
+          },
+          "tuning_cv_mae_ug_m3": 55.06327994527077,
+          "time_series_splits": 3,
+          "tuning_rows": 143
+        },
+        "ridge_log": {
+          "best_params": {
+            "regressor__model__alpha": 10.0
+          },
+          "tuning_cv_mae_ug_m3": 52.35673391658887,
+          "time_series_splits": 3,
+          "tuning_rows": 143
+        },
+        "random_forest": {
+          "best_params": {
+            "model__max_depth": 3,
+            "model__min_samples_leaf": 2,
+            "model__n_estimators": 30
+          },
+          "tuning_cv_mae_ug_m3": 50.905453413920775,
+          "time_series_splits": 3,
+          "tuning_rows": 143
+        },
+        "xgboost": {
+          "best_params": {
+            "model__learning_rate": 0.05,
+            "model__max_depth": 2,
+            "model__min_child_weight": 1,
+            "model__n_estimators": 30,
+            "model__reg_lambda": 5.0
+          },
+          "tuning_cv_mae_ug_m3": 53.215444292340955,
+          "time_series_splits": 3,
+          "tuning_rows": 143
+        }
+      },
+      "validation_recursive_metrics": {
+        "ridge_raw": {
+          "n": 72,
+          "mae": 20.16949440212351,
+          "rmse": 23.40008467069376,
+          "r2": 0.48843682143916056,
+          "mape_pct": 28.32857850266738,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 36.58633000047058,
+          "wape_pct": 22.550795797209382
+        },
+        "ridge_log": {
+          "n": 72,
+          "mae": 10.015011194616308,
+          "rmse": 12.456236588816456,
+          "r2": 0.8550433591448746,
+          "mape_pct": 12.484586425380433,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 12.479849565423422,
+          "wape_pct": 11.197428545000141
+        },
+        "random_forest": {
+          "n": 72,
+          "mae": 18.552798792795684,
+          "rmse": 22.61286191633057,
+          "r2": 0.5222777369576137,
+          "mape_pct": 27.849002772266008,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 22.453072867230212,
+          "wape_pct": 20.7432258192352
+        },
+        "xgboost": {
+          "n": 72,
+          "mae": 37.97913943396674,
+          "rmse": 42.27928056187435,
+          "r2": -0.6700120185529228,
+          "mape_pct": 57.728923883115925,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 39.79834226315877,
+          "wape_pct": 42.46312777374109
+        },
+        "seasonal_naive": {
+          "n": 72,
+          "mae": 18.85,
+          "rmse": 21.79944571160775,
+          "r2": 0.5560282655380594,
+          "mape_pct": 21.64698035144128,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 22.943479662299,
+          "wape_pct": 21.075515940183546
+        },
+        "three_year_seasonal_mean": {
+          "n": 72,
+          "mae": 8.361111111111107,
+          "rmse": 10.685030488642035,
+          "r2": 0.8933364703851524,
+          "mape_pct": 9.744647255723866,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 9.17784387303446,
+          "wape_pct": 9.34826156497973
+        }
+      },
+      "validation_one_step_metrics": {
+        "ridge_raw": {
+          "n": 6,
+          "mae": 21.560043745339144,
+          "rmse": 24.11336251690583,
+          "r2": -0.7703799645102731,
+          "mape_pct": 29.54460254097499,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 35.6260186495228,
+          "wape_pct": 31.029086704733714
+        },
+        "ridge_log": {
+          "n": 6,
+          "mae": 14.277274133154735,
+          "rmse": 17.01647559297675,
+          "r2": 0.11836227410068423,
+          "mape_pct": 18.466957492248614,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 20.688035337935062,
+          "wape_pct": 20.54776800166189
+        },
+        "random_forest": {
+          "n": 6,
+          "mae": 17.35208925287631,
+          "rmse": 18.700769250978762,
+          "r2": -0.06480450121753467,
+          "mape_pct": 26.375016415931864,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 24.902915690556974,
+          "wape_pct": 24.973023630908582
+        },
+        "xgboost": {
+          "n": 6,
+          "mae": 27.17019704182943,
+          "rmse": 32.23115683865245,
+          "r2": -2.1630257121685155,
+          "mape_pct": 48.77440639071868,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 35.48401216252628,
+          "wape_pct": 39.10318595609897
+        },
+        "seasonal_naive": {
+          "n": 6,
+          "mae": 10.116666666666662,
+          "rmse": 11.976574357191344,
+          "r2": 0.5632668423033498,
+          "mape_pct": 13.602256498581832,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 14.573334036522242,
+          "wape_pct": 14.559846485967853
+        },
+        "three_year_seasonal_mean": {
+          "n": 6,
+          "mae": 9.233333333333329,
+          "rmse": 11.613466002558946,
+          "r2": 0.5893473391606374,
+          "mape_pct": 11.671056646299476,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 12.728125396936004,
+          "wape_pct": 13.288558407291909
+        }
+      },
+      "final_holdout_one_step_metrics": {
+        "ridge_raw": {
+          "n": 12,
+          "mae": 12.350390664317084,
+          "rmse": 15.16725277133874,
+          "r2": 0.6761828407503181,
+          "mape_pct": 19.889213918002614,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 19.4445169549496,
+          "wape_pct": 19.423943377693966
+        },
+        "ridge_log": {
+          "n": 12,
+          "mae": 15.163517895584471,
+          "rmse": 17.463960030518262,
+          "r2": 0.5706895432027925,
+          "mape_pct": 29.604335470331595,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 24.53858084291012,
+          "wape_pct": 23.84825881350113
+        },
+        "random_forest": {
+          "n": 12,
+          "mae": 21.717676334295685,
+          "rmse": 25.12476402862088,
+          "r2": 0.11143338410756809,
+          "mape_pct": 51.78947593975681,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 35.923712740602554,
+          "wape_pct": 34.15624063060919
+        },
+        "xgboost": {
+          "n": 12,
+          "mae": 36.191583633422844,
+          "rmse": 40.655034047847096,
+          "r2": -1.3265621988437108,
+          "mape_pct": 86.78762433309217,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 51.3675694296139,
+          "wape_pct": 56.91992183500315
+        },
+        "seasonal_naive": {
+          "n": 12,
+          "mae": 27.333333333333332,
+          "rmse": 30.863867763670402,
+          "r2": -0.3408701058257948,
+          "mape_pct": 53.886325065442605,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 39.30631746823717,
+          "wape_pct": 42.98820445609435
+        },
+        "three_year_seasonal_mean": {
+          "n": 12,
+          "mae": 21.588888888888892,
+          "rmse": 24.399241032519082,
+          "r2": 0.16201037078454716,
+          "mape_pct": 44.13809419209927,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 33.53515820427616,
+          "wape_pct": 33.953691568370466
+        }
+      },
+      "final_holdout_recursive_metrics": {
+        "ridge_raw": {
+          "n": 12,
+          "mae": 15.89823434206174,
+          "rmse": 20.765370972227338,
+          "r2": 0.3930325556308987,
+          "mape_pct": 23.994160147769016,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 21.319809408609128,
+          "wape_pct": 25.003776160516487
+        },
+        "ridge_log": {
+          "n": 12,
+          "mae": 17.989432799265256,
+          "rmse": 20.81950181629616,
+          "r2": 0.38986396462038875,
+          "mape_pct": 35.73444583557554,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 28.52622017973698,
+          "wape_pct": 28.292685922828703
+        },
+        "random_forest": {
+          "n": 12,
+          "mae": 27.977088667146116,
+          "rmse": 30.93033597465829,
+          "r2": -0.3466517018026818,
+          "mape_pct": 62.1358159057258,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 42.76024202967255,
+          "wape_pct": 44.00066369669112
+        },
+        "xgboost": {
+          "n": 12,
+          "mae": 44.415449778238944,
+          "rmse": 48.28067443907916,
+          "r2": -2.281199719043546,
+          "mape_pct": 101.60081421657483,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 58.435700244764064,
+          "wape_pct": 69.85391839303632
+        },
+        "seasonal_naive": {
+          "n": 12,
+          "mae": 27.333333333333332,
+          "rmse": 30.863867763670402,
+          "r2": -0.3408701058257948,
+          "mape_pct": 53.886325065442605,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 39.30631746823717,
+          "wape_pct": 42.98820445609435
+        },
+        "three_year_seasonal_mean": {
+          "n": 12,
+          "mae": 21.588888888888892,
+          "rmse": 24.399241032519082,
+          "r2": 0.16201037078454716,
+          "mape_pct": 44.13809419209927,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 33.53515820427616,
+          "wape_pct": 33.953691568370466
+        }
+      },
+      "prediction_interval_by_horizon": [
+        {
+          "horizon": 1,
+          "published_forecast_horizon": 1,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 3,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 2,
+          "published_forecast_horizon": 2,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 4,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 3,
+          "published_forecast_horizon": 3,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 5,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 4,
+          "published_forecast_horizon": 4,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 6,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 5,
+          "published_forecast_horizon": 5,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 7,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 6,
+          "published_forecast_horizon": 6,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 8,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 7,
+          "published_forecast_horizon": 7,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 9,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 8,
+          "published_forecast_horizon": 8,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 10,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 9,
+          "published_forecast_horizon": 9,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 11,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 10,
+          "published_forecast_horizon": 10,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 12,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 33.5,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 67.0,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 11,
+          "published_forecast_horizon": 11,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 13,
+          "calibration_residual_count": 29,
+          "radius_ug_m3": 39.76666666666668,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 79.53333333333336,
+          "95pct_finite_sample_rank": 29,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 12,
+          "published_forecast_horizon": 12,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 14,
+          "calibration_residual_count": 28,
+          "radius_ug_m3": 39.76666666666668,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 79.53333333333336,
+          "95pct_finite_sample_rank": 28,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        }
+      ],
+      "SO2_diagnostics": null,
+      "october_2026_check": {
+        "actual_ug_m3": null,
+        "prediction_ug_m3": null,
+        "absolute_error_ug_m3": null,
+        "status": "actual_missing"
+      }
+    },
+    "PM2.5": {
+      "observed_month_count": 193,
+      "first_observed_month": "2010-07-01",
+      "last_observed_month": "2026-08-01",
+      "forecast_bridge_months_skipped_from_output": 3,
+      "forecast_start": "2026-12-01",
+      "validation_origins": [
+        "2021-08-01",
+        "2021-09-01",
+        "2021-10-01",
+        "2021-11-01",
+        "2021-12-01",
+        "2022-01-01",
+        "2022-02-01",
+        "2022-03-01",
+        "2022-04-01",
+        "2022-05-01",
+        "2022-06-01",
+        "2022-07-01",
+        "2022-08-01",
+        "2022-09-01",
+        "2022-10-01",
+        "2022-11-01",
+        "2022-12-01",
+        "2023-01-01",
+        "2023-02-01",
+        "2023-03-01",
+        "2023-04-01",
+        "2023-05-01",
+        "2023-06-01",
+        "2023-07-01",
+        "2023-08-01",
+        "2023-09-01",
+        "2023-10-01",
+        "2023-11-01",
+        "2023-12-01",
+        "2024-01-01",
+        "2024-02-01",
+        "2024-03-01",
+        "2024-04-01",
+        "2024-05-01",
+        "2024-06-01",
+        "2024-07-01"
+      ],
+      "validation_origin_count": 36,
+      "selection_origin_count_requested": 6,
+      "max_validation_origins_requested": 36,
+      "model_selection_origins": [
+        "2021-08-01",
+        "2021-09-01",
+        "2021-10-01",
+        "2021-11-01",
+        "2021-12-01",
+        "2022-01-01"
+      ],
+      "model_selection_origin_count": 6,
+      "interval_calibration_origins": [
+        "2022-02-01",
+        "2022-03-01",
+        "2022-04-01",
+        "2022-05-01",
+        "2022-06-01",
+        "2022-07-01",
+        "2022-08-01",
+        "2022-09-01",
+        "2022-10-01",
+        "2022-11-01",
+        "2022-12-01",
+        "2023-01-01",
+        "2023-02-01",
+        "2023-03-01",
+        "2023-04-01",
+        "2023-05-01",
+        "2023-06-01",
+        "2023-07-01",
+        "2023-08-01",
+        "2023-09-01",
+        "2023-10-01",
+        "2023-11-01",
+        "2023-12-01",
+        "2024-01-01",
+        "2024-02-01",
+        "2024-03-01",
+        "2024-04-01",
+        "2024-05-01",
+        "2024-06-01",
+        "2024-07-01"
+      ],
+      "interval_calibration_origin_count": 30,
+      "bridge_month_count": 3,
+      "calibration_horizon_months": 15,
+      "model_stability_by_method": {
+        "random_forest": {
+          "method": "random_forest",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 13.210595269103498,
+          "std_origin_mae_ug_m3": 1.7876242265196034,
+          "mean_origin_rank": 5.0,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.13531746224187488,
+          "target": "PM2.5"
+        },
+        "ridge_log": {
+          "method": "ridge_log",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 4.443886715548202,
+          "std_origin_mae_ug_m3": 0.5526762248092066,
+          "mean_origin_rank": 1.1666666666666667,
+          "best_rank_count": 5,
+          "origin_mae_cv": 0.12436775736778159,
+          "target": "PM2.5"
+        },
+        "ridge_raw": {
+          "method": "ridge_raw",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 9.08066431781586,
+          "std_origin_mae_ug_m3": 0.5926184232421423,
+          "mean_origin_rank": 3.5,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.06526157145567547,
+          "target": "PM2.5"
+        },
+        "seasonal_naive": {
+          "method": "seasonal_naive",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 6.027777777777776,
+          "std_origin_mae_ug_m3": 0.43883262649223637,
+          "mean_origin_rank": 2.1666666666666665,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.07280172605401158,
+          "target": "PM2.5"
+        },
+        "three_year_seasonal_mean": {
+          "method": "three_year_seasonal_mean",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 8.184722222222222,
+          "std_origin_mae_ug_m3": 1.6018100775970163,
+          "mean_origin_rank": 3.1666666666666665,
+          "best_rank_count": 1,
+          "origin_mae_cv": 0.19570732324280532,
+          "target": "PM2.5"
+        },
+        "xgboost": {
+          "method": "xgboost",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 23.334155972798666,
+          "std_origin_mae_ug_m3": 0.6616167775817867,
+          "mean_origin_rank": 6.0,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.028354005105350865,
+          "target": "PM2.5"
+        }
+      },
+      "final_holdout_start": "2025-09-01",
+      "final_holdout_end": "2026-08-01",
+      "selected_method_by_mean_origin_mae": "ridge_log",
+      "selected_method_by_recursive_validation_mae": "ridge_log",
+      "tuning": {
+        "ridge_raw": {
+          "best_params": {
+            "model__alpha": 10.0
+          },
+          "tuning_cv_mae_ug_m3": 21.76018083134099,
+          "time_series_splits": 3,
+          "tuning_rows": 122
+        },
+        "ridge_log": {
+          "best_params": {
+            "regressor__model__alpha": 1.0
+          },
+          "tuning_cv_mae_ug_m3": 16.521709554149943,
+          "time_series_splits": 3,
+          "tuning_rows": 122
+        },
+        "random_forest": {
+          "best_params": {
+            "model__max_depth": 3,
+            "model__min_samples_leaf": 2,
+            "model__n_estimators": 30
+          },
+          "tuning_cv_mae_ug_m3": 24.55941857810447,
+          "time_series_splits": 3,
+          "tuning_rows": 122
+        },
+        "xgboost": {
+          "best_params": {
+            "model__learning_rate": 0.05,
+            "model__max_depth": 2,
+            "model__min_child_weight": 1,
+            "model__n_estimators": 30,
+            "model__reg_lambda": 5.0
+          },
+          "tuning_cv_mae_ug_m3": 26.659511718749997,
+          "time_series_splits": 3,
+          "tuning_rows": 122
+        }
+      },
+      "validation_recursive_metrics": {
+        "ridge_raw": {
+          "n": 72,
+          "mae": 9.08066431781586,
+          "rmse": 10.317507057938522,
+          "r2": 0.9137227618963559,
+          "mape_pct": 45.60239378972815,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 73.42584971360839,
+          "wape_pct": 22.042676608433357
+        },
+        "ridge_log": {
+          "n": 72,
+          "mae": 4.443886715548203,
+          "rmse": 6.310335547212576,
+          "r2": 0.9677260894444808,
+          "mape_pct": 15.123884291760847,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 13.681631437321473,
+          "wape_pct": 10.787223745641434
+        },
+        "random_forest": {
+          "n": 72,
+          "mae": 13.210595269103498,
+          "rmse": 15.559285356168262,
+          "r2": 0.8037878139447683,
+          "mape_pct": 58.449436688680514,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 42.17206948264745,
+          "wape_pct": 32.06779472625507
+        },
+        "xgboost": {
+          "n": 72,
+          "mae": 23.334155972798662,
+          "rmse": 24.351084595174914,
+          "r2": 0.5194005121838587,
+          "mape_pct": 126.62977151420671,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 66.58210097700554,
+          "wape_pct": 56.642029265415985
+        },
+        "seasonal_naive": {
+          "n": 72,
+          "mae": 6.027777777777777,
+          "rmse": 7.618562856602285,
+          "r2": 0.9529572398960161,
+          "mape_pct": 22.84202343341794,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 19.60727576502857,
+          "wape_pct": 14.63200836114763
+        },
+        "three_year_seasonal_mean": {
+          "n": 72,
+          "mae": 8.184722222222222,
+          "rmse": 11.578296933337958,
+          "r2": 0.8913484187665655,
+          "mape_pct": 27.179564590797085,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 22.927797863047612,
+          "wape_pct": 19.867839924479952
+        }
+      },
+      "validation_one_step_metrics": {
+        "ridge_raw": {
+          "n": 6,
+          "mae": 11.298863295804145,
+          "rmse": 11.75472304934536,
+          "r2": -2.079647413821941,
+          "mape_pct": 78.4943195309515,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 144.683512040485,
+          "wape_pct": 68.47795936850997
+        },
+        "ridge_log": {
+          "n": 6,
+          "mae": 3.0350121202102103,
+          "rmse": 3.7772475777439984,
+          "r2": 0.6820000164136798,
+          "mape_pct": 18.113978160937773,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 20.35751206155685,
+          "wape_pct": 18.39401284975885
+        },
+        "random_forest": {
+          "n": 6,
+          "mae": 5.290286846625429,
+          "rmse": 6.331690234632164,
+          "r2": 0.10645688200587733,
+          "mape_pct": 38.92628305159136,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 29.97382612977647,
+          "wape_pct": 32.0623445250026
+        },
+        "xgboost": {
+          "n": 6,
+          "mae": 18.80446497599284,
+          "rmse": 19.049886856927216,
+          "r2": -7.08836974580375,
+          "mape_pct": 138.1509239289086,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 76.96623224022223,
+          "wape_pct": 113.9664543999566
+        },
+        "seasonal_naive": {
+          "n": 6,
+          "mae": 3.4999999999999987,
+          "rmse": 4.488132499529545,
+          "r2": 0.5510401188707283,
+          "mape_pct": 20.242770476669307,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 18.70488035267172,
+          "wape_pct": 21.212121212121204
+        },
+        "three_year_seasonal_mean": {
+          "n": 6,
+          "mae": 2.5833333333333335,
+          "rmse": 3.408893596983566,
+          "r2": 0.7409980188211986,
+          "mape_pct": 13.960025990048258,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 14.731840970852186,
+          "wape_pct": 15.656565656565657
+        }
+      },
+      "final_holdout_one_step_metrics": {
+        "ridge_raw": {
+          "n": 12,
+          "mae": 11.47193530785183,
+          "rmse": 13.32073158954435,
+          "r2": 0.6448508444974357,
+          "mape_pct": 54.883648827116794,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 86.69636543687155,
+          "wape_pct": 38.604381293948954
+        },
+        "ridge_log": {
+          "n": 12,
+          "mae": 4.381722610838536,
+          "rmse": 6.078288654649175,
+          "r2": 0.9260535596380336,
+          "mape_pct": 19.002234482126447,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 18.402528270991546,
+          "wape_pct": 14.745000372984418
+        },
+        "random_forest": {
+          "n": 12,
+          "mae": 8.479101804218908,
+          "rmse": 10.763800609645862,
+          "r2": 0.7681079179547131,
+          "mape_pct": 34.07464723941207,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 28.129600083351974,
+          "wape_pct": 28.533152453905476
+        },
+        "xgboost": {
+          "n": 12,
+          "mae": 15.591816933949792,
+          "rmse": 16.64960777794198,
+          "r2": 0.445166537788791,
+          "mape_pct": 101.85509144458511,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 58.604972950612456,
+          "wape_pct": 52.468256648176535
+        },
+        "seasonal_naive": {
+          "n": 12,
+          "mae": 9.124999999999998,
+          "rmse": 13.73356593654151,
+          "r2": 0.6224962541454588,
+          "mape_pct": 25.6600919685042,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 21.893041703514278,
+          "wape_pct": 30.706674144699942
+        },
+        "three_year_seasonal_mean": {
+          "n": 12,
+          "mae": 10.46111111111111,
+          "rmse": 16.88534867866222,
+          "r2": 0.42934359285132506,
+          "mape_pct": 26.737773276259258,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 21.74166417519554,
+          "wape_pct": 35.202841652645354
+        }
+      },
+      "final_holdout_recursive_metrics": {
+        "ridge_raw": {
+          "n": 12,
+          "mae": 12.537824709608797,
+          "rmse": 15.048027215457665,
+          "r2": 0.546775094124356,
+          "mape_pct": 57.466169869922645,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 88.18388450816525,
+          "wape_pct": 42.191221681241046
+        },
+        "ridge_log": {
+          "n": 12,
+          "mae": 4.580915628843413,
+          "rmse": 6.455553091732304,
+          "r2": 0.9165893422626195,
+          "mape_pct": 19.347568022737736,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 18.26154145417527,
+          "wape_pct": 15.415307780740594
+        },
+        "random_forest": {
+          "n": 12,
+          "mae": 8.706184536573135,
+          "rmse": 11.223220363955068,
+          "r2": 0.7478902673295187,
+          "mape_pct": 35.04963472992873,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 28.749765700683938,
+          "wape_pct": 29.29731195706047
+        },
+        "xgboost": {
+          "n": 12,
+          "mae": 16.636352729797366,
+          "rmse": 17.611176349683554,
+          "r2": 0.3792290813353577,
+          "mape_pct": 108.22205062408013,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 60.73583093782366,
+          "wape_pct": 55.98323969645777
+        },
+        "seasonal_naive": {
+          "n": 12,
+          "mae": 9.124999999999998,
+          "rmse": 13.73356593654151,
+          "r2": 0.6224962541454588,
+          "mape_pct": 25.6600919685042,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 21.893041703514278,
+          "wape_pct": 30.706674144699942
+        },
+        "three_year_seasonal_mean": {
+          "n": 12,
+          "mae": 10.46111111111111,
+          "rmse": 16.88534867866222,
+          "r2": 0.42934359285132506,
+          "mape_pct": 26.737773276259258,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 21.74166417519554,
+          "wape_pct": 35.202841652645354
+        }
+      },
+      "prediction_interval_by_horizon": [
+        {
+          "horizon": 1,
+          "published_forecast_horizon": 1,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 4,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 29.801435209158385,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 59.60287041831677,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 2,
+          "published_forecast_horizon": 2,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 5,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 29.109735813039933,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 58.219471626079866,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 3,
+          "published_forecast_horizon": 3,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 6,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 28.521500308296226,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 57.04300061659245,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 4,
+          "published_forecast_horizon": 4,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 7,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 28.067224000253702,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 56.134448000507405,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 5,
+          "published_forecast_horizon": 5,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 8,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 28.01672220185634,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 56.03344440371268,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 6,
+          "published_forecast_horizon": 6,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 9,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 27.54489795951349,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 55.08979591902698,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 7,
+          "published_forecast_horizon": 7,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 10,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 27.186541003346903,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 54.37308200669381,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 8,
+          "published_forecast_horizon": 8,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 11,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 26.812595868703355,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 53.62519173740671,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 9,
+          "published_forecast_horizon": 9,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 12,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 27.403741806851713,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 54.807483613703425,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 10,
+          "published_forecast_horizon": 10,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 13,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 29.75873952318024,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 59.51747904636048,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 11,
+          "published_forecast_horizon": 11,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 14,
+          "calibration_residual_count": 29,
+          "radius_ug_m3": 30.966677792924614,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 61.93335558584923,
+          "95pct_finite_sample_rank": 29,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 12,
+          "published_forecast_horizon": 12,
+          "bridge_month_count": 3,
+          "effective_calibration_horizon": 15,
+          "calibration_residual_count": 28,
+          "radius_ug_m3": 30.48352168090034,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 60.96704336180068,
+          "95pct_finite_sample_rank": 28,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        }
+      ],
+      "SO2_diagnostics": null,
+      "october_2026_check": {
+        "actual_ug_m3": null,
+        "prediction_ug_m3": null,
+        "absolute_error_ug_m3": null,
+        "status": "actual_missing"
+      }
+    },
+    "SO2": {
+      "observed_month_count": 296,
+      "first_observed_month": "2002-02-01",
+      "last_observed_month": "2026-09-01",
+      "forecast_bridge_months_skipped_from_output": 2,
+      "forecast_start": "2026-12-01",
+      "validation_origins": [
+        "2021-10-01",
+        "2021-11-01",
+        "2021-12-01",
+        "2022-01-01",
+        "2022-02-01",
+        "2022-03-01",
+        "2022-04-01",
+        "2022-05-01",
+        "2022-06-01",
+        "2022-07-01",
+        "2022-08-01",
+        "2022-09-01",
+        "2022-10-01",
+        "2022-11-01",
+        "2022-12-01",
+        "2023-01-01",
+        "2023-02-01",
+        "2023-03-01",
+        "2023-04-01",
+        "2023-05-01",
+        "2023-06-01",
+        "2023-07-01",
+        "2023-08-01",
+        "2023-09-01",
+        "2023-10-01",
+        "2023-11-01",
+        "2023-12-01",
+        "2024-01-01",
+        "2024-02-01",
+        "2024-03-01",
+        "2024-04-01",
+        "2024-05-01",
+        "2024-06-01",
+        "2024-07-01",
+        "2024-08-01",
+        "2024-09-01"
+      ],
+      "validation_origin_count": 36,
+      "selection_origin_count_requested": 6,
+      "max_validation_origins_requested": 36,
+      "model_selection_origins": [
+        "2021-10-01",
+        "2021-11-01",
+        "2021-12-01",
+        "2022-01-01",
+        "2022-02-01",
+        "2022-03-01"
+      ],
+      "model_selection_origin_count": 6,
+      "interval_calibration_origins": [
+        "2022-04-01",
+        "2022-05-01",
+        "2022-06-01",
+        "2022-07-01",
+        "2022-08-01",
+        "2022-09-01",
+        "2022-10-01",
+        "2022-11-01",
+        "2022-12-01",
+        "2023-01-01",
+        "2023-02-01",
+        "2023-03-01",
+        "2023-04-01",
+        "2023-05-01",
+        "2023-06-01",
+        "2023-07-01",
+        "2023-08-01",
+        "2023-09-01",
+        "2023-10-01",
+        "2023-11-01",
+        "2023-12-01",
+        "2024-01-01",
+        "2024-02-01",
+        "2024-03-01",
+        "2024-04-01",
+        "2024-05-01",
+        "2024-06-01",
+        "2024-07-01",
+        "2024-08-01",
+        "2024-09-01"
+      ],
+      "interval_calibration_origin_count": 30,
+      "bridge_month_count": 2,
+      "calibration_horizon_months": 14,
+      "model_stability_by_method": {
+        "random_forest": {
+          "method": "random_forest",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 14.344165268743367,
+          "std_origin_mae_ug_m3": 0.9882513361074409,
+          "mean_origin_rank": 2.8333333333333335,
+          "best_rank_count": 2,
+          "origin_mae_cv": 0.06889570202184497,
+          "target": "SO2"
+        },
+        "ridge_log": {
+          "method": "ridge_log",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 466.8329427137076,
+          "std_origin_mae_ug_m3": 479.90212614164915,
+          "mean_origin_rank": 6.0,
+          "best_rank_count": 0,
+          "origin_mae_cv": 1.0279954181295994,
+          "target": "SO2"
+        },
+        "ridge_raw": {
+          "method": "ridge_raw",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 13.402761777493657,
+          "std_origin_mae_ug_m3": 3.497019647465984,
+          "mean_origin_rank": 2.6666666666666665,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.2609178395857405,
+          "target": "SO2"
+        },
+        "seasonal_naive": {
+          "method": "seasonal_naive",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 10.720833333333339,
+          "std_origin_mae_ug_m3": 4.558882508051968,
+          "mean_origin_rank": 1.8333333333333333,
+          "best_rank_count": 3,
+          "origin_mae_cv": 0.42523583440826734,
+          "target": "SO2"
+        },
+        "three_year_seasonal_mean": {
+          "method": "three_year_seasonal_mean",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 12.774537037037035,
+          "std_origin_mae_ug_m3": 3.6575675890848935,
+          "mean_origin_rank": 2.6666666666666665,
+          "best_rank_count": 1,
+          "origin_mae_cv": 0.2863170366550709,
+          "target": "SO2"
+        },
+        "xgboost": {
+          "method": "xgboost",
+          "origin_count": 6,
+          "mean_origin_mae_ug_m3": 19.694847226142883,
+          "std_origin_mae_ug_m3": 1.5970959409752545,
+          "mean_origin_rank": 5.0,
+          "best_rank_count": 0,
+          "origin_mae_cv": 0.08109207056225722,
+          "target": "SO2"
+        }
+      },
+      "final_holdout_start": "2025-10-01",
+      "final_holdout_end": "2026-09-01",
+      "selected_method_by_mean_origin_mae": "seasonal_naive",
+      "selected_method_by_recursive_validation_mae": "seasonal_naive",
+      "tuning": {
+        "ridge_raw": {
+          "best_params": {
+            "model__alpha": 0.1
+          },
+          "tuning_cv_mae_ug_m3": 9.315422234295129,
+          "time_series_splits": 3,
+          "tuning_rows": 225
+        },
+        "ridge_log": {
+          "best_params": {
+            "regressor__model__alpha": 1.0
+          },
+          "tuning_cv_mae_ug_m3": 11.329821746997519,
+          "time_series_splits": 3,
+          "tuning_rows": 225
+        },
+        "random_forest": {
+          "best_params": {
+            "model__max_depth": 3,
+            "model__min_samples_leaf": 2,
+            "model__n_estimators": 30
+          },
+          "tuning_cv_mae_ug_m3": 11.059798057566253,
+          "time_series_splits": 3,
+          "tuning_rows": 225
+        },
+        "xgboost": {
+          "best_params": {
+            "model__learning_rate": 0.05,
+            "model__max_depth": 2,
+            "model__min_child_weight": 1,
+            "model__n_estimators": 30,
+            "model__reg_lambda": 5.0
+          },
+          "tuning_cv_mae_ug_m3": 13.030291767347427,
+          "time_series_splits": 3,
+          "tuning_rows": 225
+        }
+      },
+      "validation_recursive_metrics": {
+        "ridge_raw": {
+          "n": 72,
+          "mae": 13.402761777493655,
+          "rmse": 18.34874594815056,
+          "r2": 0.8803753812640436,
+          "mape_pct": 51.17083020160539,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 34.24321220325959,
+          "wape_pct": 21.845897900969895
+        },
+        "ridge_log": {
+          "n": 72,
+          "mae": 466.83294271370755,
+          "rmse": 677.6405696776559,
+          "r2": -162.15732983484745,
+          "mape_pct": 2659.12672850702,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 97.97421906345572,
+          "wape_pct": 760.9166657321654
+        },
+        "random_forest": {
+          "n": 72,
+          "mae": 14.344165268743366,
+          "rmse": 21.373892610944118,
+          "r2": 0.8376788774280897,
+          "mape_pct": 31.586049131037374,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 25.54424801225571,
+          "wape_pct": 23.380343181344312
+        },
+        "xgboost": {
+          "n": 72,
+          "mae": 19.694847226142883,
+          "rmse": 29.241500181445556,
+          "r2": 0.6961864841729352,
+          "mape_pct": 35.59366738117502,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 34.904958672007155,
+          "wape_pct": 32.10171372291416
+        },
+        "seasonal_naive": {
+          "n": 72,
+          "mae": 10.720833333333339,
+          "rmse": 18.347823818886233,
+          "r2": 0.8803874046023299,
+          "mape_pct": 21.63698077569286,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 19.841941838634934,
+          "wape_pct": 17.474475358250523
+        },
+        "three_year_seasonal_mean": {
+          "n": 72,
+          "mae": 12.774537037037035,
+          "rmse": 18.176893570589645,
+          "r2": 0.8826056703801402,
+          "mape_pct": 21.32295508786911,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 25.317643995994327,
+          "wape_pct": 20.82191987564047
+        }
+      },
+      "validation_one_step_metrics": {
+        "ridge_raw": {
+          "n": 6,
+          "mae": 5.93900254907894,
+          "rmse": 7.399027150285065,
+          "r2": -0.5847364991023121,
+          "mape_pct": 57.48068854529921,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 43.69780548904047,
+          "wape_pct": 56.20507144238744
+        },
+        "ridge_log": {
+          "n": 6,
+          "mae": 2.086726110047538,
+          "rmse": 2.6921737637023337,
+          "r2": 0.7901958889527365,
+          "mape_pct": 21.490434411430147,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 18.401731330123283,
+          "wape_pct": 19.748196625055563
+        },
+        "random_forest": {
+          "n": 6,
+          "mae": 3.8439566620779004,
+          "rmse": 5.295950156483876,
+          "r2": 0.18811298272923238,
+          "mape_pct": 29.86994073346342,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 25.615635116673296,
+          "wape_pct": 36.37813875783502
+        },
+        "xgboost": {
+          "n": 6,
+          "mae": 5.8917283376057945,
+          "rmse": 6.041061391738872,
+          "r2": -0.05641441140144088,
+          "mape_pct": 70.72732201822475,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 49.44934178334759,
+          "wape_pct": 55.757681428446006
+        },
+        "seasonal_naive": {
+          "n": 6,
+          "mae": 1.7666666666666666,
+          "rmse": 2.4055491403558285,
+          "r2": 0.832491717860474,
+          "mape_pct": 17.66651361637631,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 15.384892678327788,
+          "wape_pct": 16.7192429022082
+        },
+        "three_year_seasonal_mean": {
+          "n": 6,
+          "mae": 3.961111111111111,
+          "rmse": 5.667663311048692,
+          "r2": 0.07014355708511522,
+          "mape_pct": 31.607480973373853,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 26.00632300430491,
+          "wape_pct": 37.48685594111462
+        }
+      },
+      "final_holdout_one_step_metrics": {
+        "ridge_raw": {
+          "n": 12,
+          "mae": 10.536250572276872,
+          "rmse": 15.28441953805818,
+          "r2": -0.029761810569030933,
+          "mape_pct": 46.196047637195356,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 43.18475937757155,
+          "wape_pct": 53.213386728671075
+        },
+        "ridge_log": {
+          "n": 12,
+          "mae": 10.66502559809174,
+          "rmse": 16.27234515875417,
+          "r2": -0.16718360072127747,
+          "mape_pct": 38.061611334598375,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 30.2930090531392,
+          "wape_pct": 53.86376564692799
+        },
+        "random_forest": {
+          "n": 12,
+          "mae": 21.313256617393584,
+          "rmse": 33.132936107410444,
+          "r2": -3.8390346030153877,
+          "mape_pct": 80.58591934050465,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 54.21610745446546,
+          "wape_pct": 107.6427101888565
+        },
+        "xgboost": {
+          "n": 12,
+          "mae": 11.282428296407064,
+          "rmse": 12.73285909863995,
+          "r2": 0.28535436061997455,
+          "mape_pct": 94.15739001925543,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 57.05468643460574,
+          "wape_pct": 56.98196109296497
+        },
+        "seasonal_naive": {
+          "n": 12,
+          "mae": 24.008333333333336,
+          "rmse": 37.57149850618152,
+          "r2": -5.22237119536869,
+          "mape_pct": 86.61734838324516,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 56.80764763386284,
+          "wape_pct": 121.25420875420876
+        },
+        "three_year_seasonal_mean": {
+          "n": 12,
+          "mae": 29.486111111111118,
+          "rmse": 43.656333595057696,
+          "r2": -7.401046730223101,
+          "mape_pct": 113.22395061991762,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 68.9202722833691,
+          "wape_pct": 148.9197530864198
+        }
+      },
+      "final_holdout_recursive_metrics": {
+        "ridge_raw": {
+          "n": 12,
+          "mae": 25.788226571763712,
+          "rmse": 35.038721406937924,
+          "r2": -4.411720789466459,
+          "mape_pct": 128.33289218777156,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 72.40790236332279,
+          "wape_pct": 130.24356854426117
+        },
+        "ridge_log": {
+          "n": 12,
+          "mae": 24.53816978720852,
+          "rmse": 36.8207477295456,
+          "r2": -4.97618576678668,
+          "mape_pct": 104.79697467791883,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 64.25336135761003,
+          "wape_pct": 123.93015044044708
+        },
+        "random_forest": {
+          "n": 12,
+          "mae": 26.271269600230564,
+          "rmse": 39.61095392841748,
+          "r2": -5.916230909229025,
+          "mape_pct": 96.17042675127809,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 60.355945883841244,
+          "wape_pct": 132.68317979914426
+        },
+        "xgboost": {
+          "n": 12,
+          "mae": 18.420340013504028,
+          "rmse": 24.00732885792698,
+          "r2": -1.5405430867238628,
+          "mape_pct": 117.00493862336481,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 68.75003050236008,
+          "wape_pct": 93.03202027022236
+        },
+        "seasonal_naive": {
+          "n": 12,
+          "mae": 24.008333333333336,
+          "rmse": 37.57149850618152,
+          "r2": -5.22237119536869,
+          "mape_pct": 86.61734838324516,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 56.80764763386284,
+          "wape_pct": 121.25420875420876
+        },
+        "three_year_seasonal_mean": {
+          "n": 12,
+          "mae": 29.486111111111118,
+          "rmse": 43.656333595057696,
+          "r2": -7.401046730223101,
+          "mape_pct": 113.22395061991762,
+          "mape_excluded_near_zero_n": 0,
+          "smape_pct": 68.9202722833691,
+          "wape_pct": 148.9197530864198
+        }
+      },
+      "prediction_interval_by_horizon": [
+        {
+          "horizon": 1,
+          "published_forecast_horizon": 1,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 3,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.9,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.8,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 2,
+          "published_forecast_horizon": 2,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 4,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.9,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.8,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 3,
+          "published_forecast_horizon": 3,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 5,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.9,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.8,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 4,
+          "published_forecast_horizon": 4,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 6,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.9,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.8,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 5,
+          "published_forecast_horizon": 5,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 7,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.9,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.8,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 6,
+          "published_forecast_horizon": 6,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 8,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.9,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.8,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 7,
+          "published_forecast_horizon": 7,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 9,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.9,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.8,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 8,
+          "published_forecast_horizon": 8,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 10,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.9,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.8,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 9,
+          "published_forecast_horizon": 9,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 11,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.9,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.8,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 10,
+          "published_forecast_horizon": 10,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 12,
+          "calibration_residual_count": 30,
+          "radius_ug_m3": 25.800000000000004,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 51.60000000000001,
+          "95pct_finite_sample_rank": 30,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 11,
+          "published_forecast_horizon": 11,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 13,
+          "calibration_residual_count": 29,
+          "radius_ug_m3": 34.6,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 69.2,
+          "95pct_finite_sample_rank": 29,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        },
+        {
+          "horizon": 12,
+          "published_forecast_horizon": 12,
+          "bridge_month_count": 2,
+          "effective_calibration_horizon": 14,
+          "calibration_residual_count": 28,
+          "radius_ug_m3": 34.6,
+          "calibration_coverage_pct": 100.0,
+          "average_interval_width_ug_m3": 69.2,
+          "95pct_finite_sample_rank": 28,
+          "minimum_recommended_calibration_count": 20,
+          "calibration_sample_sufficient": true,
+          "interval_status": "empirical_calibration_check_required",
+          "sample_warning": null
+        }
+      ],
+      "SO2_diagnostics": {
+        "seasonality_by_calendar_month": [
+          {
+            "month_number": 1,
+            "count": 24,
+            "mean_ug_m3": 81.14166666666667,
+            "median_ug_m3": 65.75,
+            "std_ug_m3": 51.37586911708874
+          },
+          {
+            "month_number": 2,
+            "count": 25,
+            "mean_ug_m3": 58.62,
+            "median_ug_m3": 49.4,
+            "std_ug_m3": 35.58373926388288
+          },
+          {
+            "month_number": 3,
+            "count": 25,
+            "mean_ug_m3": 31.592000000000002,
+            "median_ug_m3": 27.799999999999997,
+            "std_ug_m3": 16.567687426634613
+          },
+          {
+            "month_number": 4,
+            "count": 25,
+            "mean_ug_m3": 17.24,
+            "median_ug_m3": 14.8,
+            "std_ug_m3": 10.462074364101985
+          },
+          {
+            "month_number": 5,
+            "count": 25,
+            "mean_ug_m3": 9.06,
+            "median_ug_m3": 8.7,
+            "std_ug_m3": 4.687661108342481
+          },
+          {
+            "month_number": 6,
+            "count": 25,
+            "mean_ug_m3": 5.852,
+            "median_ug_m3": 5.6,
+            "std_ug_m3": 2.821217231385536
+          },
+          {
+            "month_number": 7,
+            "count": 25,
+            "mean_ug_m3": 4.728,
+            "median_ug_m3": 3.8,
+            "std_ug_m3": 2.823343171962393
+          },
+          {
+            "month_number": 8,
+            "count": 25,
+            "mean_ug_m3": 4.336,
+            "median_ug_m3": 3.7,
+            "std_ug_m3": 1.9699576983613971
+          },
+          {
+            "month_number": 9,
+            "count": 25,
+            "mean_ug_m3": 6.351999999999999,
+            "median_ug_m3": 5.4,
+            "std_ug_m3": 2.8934005368539397
+          },
+          {
+            "month_number": 10,
+            "count": 24,
+            "mean_ug_m3": 18.183333333333334,
+            "median_ug_m3": 16.15,
+            "std_ug_m3": 11.410432551594736
+          },
+          {
+            "month_number": 11,
+            "count": 24,
+            "mean_ug_m3": 40.541666666666664,
+            "median_ug_m3": 35.65,
+            "std_ug_m3": 22.73793835376704
+          },
+          {
+            "month_number": 12,
+            "count": 24,
+            "mean_ug_m3": 72.57083333333334,
+            "median_ug_m3": 58.5,
+            "std_ug_m3": 47.65605467410673
+          }
+        ],
+        "iqr_outliers": [
+          {
+            "month": "2011-12",
+            "value_ug_m3": 111.19999999999999
+          },
+          {
+            "month": "2012-01",
+            "value_ug_m3": 100.4
+          },
+          {
+            "month": "2013-01",
+            "value_ug_m3": 90.30000000000001
+          },
+          {
+            "month": "2016-01",
+            "value_ug_m3": 105.5
+          },
+          {
+            "month": "2016-02",
+            "value_ug_m3": 100.8
+          },
+          {
+            "month": "2019-12",
+            "value_ug_m3": 106.0
+          },
+          {
+            "month": "2020-01",
+            "value_ug_m3": 120.3
+          },
+          {
+            "month": "2020-12",
+            "value_ug_m3": 210.60000000000002
+          },
+          {
+            "month": "2021-01",
+            "value_ug_m3": 215.79999999999998
+          },
+          {
+            "month": "2021-02",
+            "value_ug_m3": 138.9
+          },
+          {
+            "month": "2021-11",
+            "value_ug_m3": 92.2
+          },
+          {
+            "month": "2021-12",
+            "value_ug_m3": 142.0
+          },
+          {
+            "month": "2022-01",
+            "value_ug_m3": 160.39999999999998
+          },
+          {
+            "month": "2022-02",
+            "value_ug_m3": 128.6
+          },
+          {
+            "month": "2022-12",
+            "value_ug_m3": 137.7
+          },
+          {
+            "month": "2023-01",
+            "value_ug_m3": 163.20000000000002
+          },
+          {
+            "month": "2023-02",
+            "value_ug_m3": 109.8
+          },
+          {
+            "month": "2023-12",
+            "value_ug_m3": 115.5
+          },
+          {
+            "month": "2024-01",
+            "value_ug_m3": 138.3
+          },
+          {
+            "month": "2024-02",
+            "value_ug_m3": 107.39999999999999
+          },
+          {
+            "month": "2024-12",
+            "value_ug_m3": 122.0
+          },
+          {
+            "month": "2025-01",
+            "value_ug_m3": 133.6
+          }
+        ],
+        "mad_robust_outliers": [
+          {
+            "month": "2010-01",
+            "value_ug_m3": 69.8
+          },
+          {
+            "month": "2011-02",
+            "value_ug_m3": 69.0
+          },
+          {
+            "month": "2011-12",
+            "value_ug_m3": 111.19999999999999
+          },
+          {
+            "month": "2012-01",
+            "value_ug_m3": 100.4
+          },
+          {
+            "month": "2012-02",
+            "value_ug_m3": 73.4
+          },
+          {
+            "month": "2012-12",
+            "value_ug_m3": 69.8
+          },
+          {
+            "month": "2013-01",
+            "value_ug_m3": 90.30000000000001
+          },
+          {
+            "month": "2015-01",
+            "value_ug_m3": 73.7
+          },
+          {
+            "month": "2015-12",
+            "value_ug_m3": 84.8
+          },
+          {
+            "month": "2016-01",
+            "value_ug_m3": 105.5
+          },
+          {
+            "month": "2016-02",
+            "value_ug_m3": 100.8
+          },
+          {
+            "month": "2016-12",
+            "value_ug_m3": 74.39999999999999
+          },
+          {
+            "month": "2017-01",
+            "value_ug_m3": 75.89999999999999
+          },
+          {
+            "month": "2019-12",
+            "value_ug_m3": 106.0
+          },
+          {
+            "month": "2020-01",
+            "value_ug_m3": 120.3
+          },
+          {
+            "month": "2020-02",
+            "value_ug_m3": 76.8
+          },
+          {
+            "month": "2020-11",
+            "value_ug_m3": 76.7
+          },
+          {
+            "month": "2020-12",
+            "value_ug_m3": 210.60000000000002
+          },
+          {
+            "month": "2021-01",
+            "value_ug_m3": 215.79999999999998
+          },
+          {
+            "month": "2021-02",
+            "value_ug_m3": 138.9
+          },
+          {
+            "month": "2021-11",
+            "value_ug_m3": 92.2
+          },
+          {
+            "month": "2021-12",
+            "value_ug_m3": 142.0
+          },
+          {
+            "month": "2022-01",
+            "value_ug_m3": 160.39999999999998
+          },
+          {
+            "month": "2022-02",
+            "value_ug_m3": 128.6
+          },
+          {
+            "month": "2022-03",
+            "value_ug_m3": 77.3
+          },
+          {
+            "month": "2022-11",
+            "value_ug_m3": 83.4
+          },
+          {
+            "month": "2022-12",
+            "value_ug_m3": 137.7
+          },
+          {
+            "month": "2023-01",
+            "value_ug_m3": 163.20000000000002
+          },
+          {
+            "month": "2023-02",
+            "value_ug_m3": 109.8
+          },
+          {
+            "month": "2023-12",
+            "value_ug_m3": 115.5
+          },
+          {
+            "month": "2024-01",
+            "value_ug_m3": 138.3
+          },
+          {
+            "month": "2024-02",
+            "value_ug_m3": 107.39999999999999
+          },
+          {
+            "month": "2024-12",
+            "value_ug_m3": 122.0
+          },
+          {
+            "month": "2025-01",
+            "value_ug_m3": 133.6
+          },
+          {
+            "month": "2025-02",
+            "value_ug_m3": 82.10000000000001
+          }
+        ],
+        "outliers_removed": false,
+        "note": "Outlier гэж тэмдэглэсэн утгуудыг устгаагүй; эх өгөгдөлтэй нь хадгалж үнэлгээнд оруулсан."
+      },
+      "october_2026_check": {
+        "actual_ug_m3": null,
+        "prediction_ug_m3": null,
+        "absolute_error_ug_m3": null,
+        "status": "actual_missing"
+      }
+    }
   },
   "forecast_horizon_months": 12,
-  "forecast_start": "2026-10-01",
-  "forecast_end": "2027-09-01",
-  "forecast_note": "Forecasts are model estimates, not observed measurements. Future values are recursive for ML models. No weather or station-level features are included. Forecast CSV includes original mg/m3 and converted ug/m3. Selection is based on lowest MAE in the same rolling-origin backtest; this may be optimistic because the same window is used for selection."
+  "forecast_period_by_target": {
+    "PM10": {
+      "start": "2026-12-01",
+      "end": "2027-11-01"
+    },
+    "PM2.5": {
+      "start": "2026-12-01",
+      "end": "2027-11-01"
+    },
+    "SO2": {
+      "start": "2026-12-01",
+      "end": "2027-11-01"
+    }
+  },
+  "selected_forecast_methods": {
+    "PM10": "three_year_seasonal_mean",
+    "PM2.5": "ridge_log",
+    "SO2": "seasonal_naive"
+  },
+  "output_files": [
+    "clean_monthly_data.csv",
+    "model_metrics.csv",
+    "forecast_12_months.csv",
+    "forecast_scenarios.csv",
+    "forecast_intervals.csv",
+    "model_stability_by_origin.csv",
+    "bridge_forecasts.csv",
+    "interval_calibration_PM10.csv",
+    "interval_calibration_PM25.csv",
+    "interval_calibration_SO2.csv",
+    "analysis_summary.json",
+    "forecast_PM10.png",
+    "forecast_PM25.png",
+    "forecast_SO2.png",
+    "model_comparison.png",
+    "horizon_error_comparison.png",
+    "recursive_validation_PM10.csv",
+    "recursive_validation_PM25.csv",
+    "recursive_validation_SO2.csv",
+    "recursive_holdout_PM10.csv",
+    "recursive_holdout_PM25.csv",
+    "recursive_holdout_SO2.csv",
+    "one_step_holdout_PM10.csv",
+    "one_step_holdout_PM25.csv",
+    "one_step_holdout_SO2.csv",
+    "models/*.joblib"
+  ]
 }
