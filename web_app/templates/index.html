@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Улаанбаатар хотын агаарын бохирдлын прогноз</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <h1>Air Pollution Prediction</h1>
+            <p>Улаанбаатар хотын агаарын бохирдол болон цаг уурын үзүүлэлтийн шинжилгээ, прогноз</p>
+        </header>
+
+        <section class="card">
+
+            <h2>Хугацаа сонгох</h2>
+
+            <div class="date-form">
+
+                <div class="form-group">
+                    <label for="startDate">Эхлэх огноо</label>
+                    <input type="date" id="startDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="endDate">Дуусах огноо</label>
+                    <input type="date" id="endDate" required>
+                </div>
+
+                <button type="button" id="predictButton">
+                    Тооцоолох
+                </button>
+
+            </div>
+
+            <p class="hint">
+                Сонгосон хугацааны сар бүрийн бодит хэмжилт болон прогнозыг харуулна.
+            </p>
+
+        </section>
+
+        <div id="message"></div>
+
+        <section class="card" id="summarySection" hidden>
+
+            <h2>Сонгосон хугацааны нэгтгэл</h2>
+
+            <div class="summary-grid" id="summaryGrid"></div>
+
+        </section>
+
+        <section class="card" id="tableSection" hidden>
+
+            <h2>Сарын үзүүлэлтүүд</h2>
+
+            <div class="legend">
+                <span class="actual-label">● Бодит хэмжилт</span>
+                <span class="forecast-label">● Прогноз</span>
+                <span class="missing-label">● Өгөгдөл байхгүй</span>
+            </div>
+
+            <div class="table-wrapper">
+
+                <table class="result-table">
+
+                    <thead>
+                        <tr>
+                            <th>Сар</th>
+                            <th>PM10<br>(µg/m³)</th>
+                            <th>PM2.5<br>(µg/m³)</th>
+                            <th>SO2<br>(µg/m³)</th>
+                            <th>Температур<br>(°C)</th>
+                            <th>Салхины хурд</th>
+                            <th>Хур тунадас</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="resultBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <section class="card" id="chartSection" hidden>
+
+            <h2>Агаарын бохирдлын өөрчлөлт</h2>
+
+            <div class="chart-container">
+                <canvas id="pollutionChart"></canvas>
+            </div>
+
+            <h2 class="weather-title">Цаг уурын үзүүлэлтийн өөрчлөлт</h2>
+
+            <div class="chart-container">
+                <canvas id="weatherChart"></canvas>
+            </div>
+
+        </section>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

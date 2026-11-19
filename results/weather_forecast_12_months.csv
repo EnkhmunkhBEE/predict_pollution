@@ -1,0 +1,37 @@
+﻿month,feature,forecast_value,method
+2026-10-01,temperature,1.5,prior_three_year_same_month_mean
+2026-11-01,temperature,-8.566666666666666,prior_three_year_same_month_mean
+2026-12-01,temperature,-18.099999999999998,prior_three_year_same_month_mean
+2027-01-01,temperature,-19.266666666666666,prior_three_year_same_month_mean
+2027-02-01,temperature,-16.8,prior_three_year_same_month_mean
+2027-03-01,temperature,-5.166666666666667,prior_three_year_same_month_mean
+2027-04-01,temperature,4.433333333333334,prior_three_year_same_month_mean
+2027-05-01,temperature,11.9,prior_three_year_same_month_mean
+2027-06-01,temperature,15.6,prior_three_year_same_month_mean
+2027-07-01,temperature,19.866666666666664,prior_three_year_same_month_mean
+2027-08-01,temperature,17.533333333333335,prior_three_year_same_month_mean
+2027-09-01,temperature,10.866666666666665,prior_three_year_same_month_mean
+2026-10-01,max wind speed,13.0,prior_three_year_same_month_mean
+2026-11-01,max wind speed,15.333333333333334,prior_three_year_same_month_mean
+2026-12-01,max wind speed,12.333333333333334,prior_three_year_same_month_mean
+2027-01-01,max wind speed,15.333333333333334,prior_three_year_same_month_mean
+2027-02-01,max wind speed,13.666666666666666,prior_three_year_same_month_mean
+2027-03-01,max wind speed,16.333333333333332,prior_three_year_same_month_mean
+2027-04-01,max wind speed,17.333333333333332,prior_three_year_same_month_mean
+2027-05-01,max wind speed,18.0,prior_three_year_same_month_mean
+2027-06-01,max wind speed,18.333333333333332,prior_three_year_same_month_mean
+2027-07-01,max wind speed,19.0,prior_three_year_same_month_mean
+2027-08-01,max wind speed,16.333333333333332,prior_three_year_same_month_mean
+2027-09-01,max wind speed,16.0,prior_three_year_same_month_mean
+2026-10-01,precipitation,5.866666666666667,prior_three_year_same_month_mean
+2026-11-01,precipitation,11.399999999999999,prior_three_year_same_month_mean
+2026-12-01,precipitation,5.333333333333333,prior_three_year_same_month_mean
+2027-01-01,precipitation,6.5,prior_three_year_same_month_mean
+2027-02-01,precipitation,1.6666666666666667,prior_three_year_same_month_mean
+2027-03-01,precipitation,7.766666666666667,prior_three_year_same_month_mean
+2027-04-01,precipitation,11.666666666666666,prior_three_year_same_month_mean
+2027-05-01,precipitation,14.05,prior_three_year_same_month_mean
+2027-06-01,precipitation,54.400000000000006,prior_three_year_same_month_mean
+2027-07-01,precipitation,76.73333333333333,prior_three_year_same_month_mean
+2027-08-01,precipitation,83.36666666666667,prior_three_year_same_month_mean
+2027-09-01,precipitation,29.433333333333337,prior_three_year_same_month_mean

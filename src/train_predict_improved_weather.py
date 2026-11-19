@@ -1,6 +1,6 @@
-"""Monthly air-pollution forecasting with leakage-safe rolling-origin evaluation.
+"""Monthly air-pollution forecasting with leakage-safe weather covariates and rolling-origin evaluation.
 
-Expected input columns: month, PM10, PM2.5, SO2. Default Excel sheet: English.
+Expected input columns: month, PM10, PM2.5, SO2, optional weather: temperature, max wind speed, precipitation. Default Excel sheet: English.
 Run from project root:
     python src/train_predict_improved.py --input-unit mg/m3
 
@@ -33,6 +33,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 TARGETS = ["PM10", "PM2.5", "SO2"]
+WEATHER_FEATURES = ["temperature", "max wind speed", "precipitation"]
 HORIZON = 12
 FINAL_HOLDOUT_MONTHS = 12
 MIN_HISTORY = 72
@@ -124,7 +125,25 @@ def read_source(path: Path, input_unit: str) -> tuple[pd.DataFrame, dict[str, st
             "positive_median_in_source_unit": float(positive.median()) if len(positive) else None,
             "unit_auto_detection_is_heuristic": input_unit == "auto",
         }
+    weather_present: list[str] = []
+    for col in WEATHER_FEATURES:
+        if col in raw.columns:
+            values = pd.to_numeric(raw[col], errors="coerce").astype(float)
+            negative_weather = int((values < 0).sum()) if col in ("max wind speed", "precipitation") else 0
+            if col in ("max wind speed", "precipitation"):
+                values = values.mask(values < 0)
+            clean[col] = values.mask(~np.isfinite(values))
+            weather_present.append(col)
+            unit_audit[col] = {
+                "source_unit": {"temperature": "degree_Celsius_assumed",
+                                "max wind speed": "source_unit_not_verified",
+                                "precipitation": "source_unit_not_verified"}[col],
+                "missing_values_after_month_reindex": int(clean[col].isna().sum()),
+                "negative_values_set_missing": negative_weather,
+            }
+
     audit = {
+        "weather_features_available": weather_present,
         "source_rows": int(original_rows), "invalid_month_rows_dropped": invalid_dates,
         "duplicate_month_rows_dropped_keep_last": duplicate_rows,
         "monthly_index_start": clean.index.min(), "monthly_index_end": clean.index.max(),
@@ -133,10 +152,9 @@ def read_source(path: Path, input_unit: str) -> tuple[pd.DataFrame, dict[str, st
     return clean.astype(float), units, audit
 
 
-def feature_row(history: pd.Series, date: pd.Timestamp) -> dict[str, float]:
-    """Build a target-month feature row using data strictly before that month."""
-    # All callers already provide a monthly-start index. Avoid rebuilding a
-    # DatetimeIndex with asfreq inside this per-row feature function.
+def feature_row(history: pd.Series, date: pd.Timestamp,
+                weather_values: dict[str, float] | None = None) -> dict[str, float]:
+    """Build target-month features using only information available before target month."""
     hist = history.loc[history.index < date].ffill().dropna()
     first = history.dropna().index.min()
     row: dict[str, float] = {
@@ -144,6 +162,8 @@ def feature_row(history: pd.Series, date: pd.Timestamp) -> dict[str, float]:
         "month_sin": float(np.sin(2 * np.pi * date.month / 12)),
         "month_cos": float(np.cos(2 * np.pi * date.month / 12)),
     }
+    for col, value in (weather_values or {}).items():
+        row[col] = float(value) if value is not None and np.isfinite(value) else np.nan
     for lag in LAGS:
         cutoff = date - pd.DateOffset(months=lag)
         eligible = hist.loc[hist.index <= cutoff]
@@ -154,30 +174,29 @@ def feature_row(history: pd.Series, date: pd.Timestamp) -> dict[str, float]:
     return row
 
 
-def make_supervised(series: pd.Series) -> tuple[pd.DataFrame, pd.Series]:
-    """Vectorized monthly feature construction; every feature uses past data only."""
+def make_supervised(series: pd.Series,
+                    weather: dict[str, pd.Series] | None = None) -> tuple[pd.DataFrame, pd.Series]:
+    """Create past-only target lags and same-month observed weather covariates."""
     s = series.asfreq("MS").astype(float)
     if s.dropna().empty:
         return pd.DataFrame(), pd.Series(dtype=float)
-
     first_observed = s.dropna().index.min()
     filled = s.ffill()
     features = pd.DataFrame(index=s.index)
     features["trend_years"] = (s.index - first_observed).days / 365.25
     features["month_sin"] = np.sin(2 * np.pi * s.index.month / 12)
     features["month_cos"] = np.cos(2 * np.pi * s.index.month / 12)
-
-    # shift(k) means the feature for month t only sees values through t-k.
+    for col in WEATHER_FEATURES:
+        if weather is not None and col in weather:
+            features[col] = weather[col].reindex(s.index).astype(float)
     for lag in LAGS:
         features[f"lag_{lag}"] = filled.shift(lag)
     prior_values = filled.shift(1)
     for window in (3, 6, 12):
         features[f"mean_{window}"] = prior_values.rolling(window=window, min_periods=window).mean()
-
-    valid = s.notna() & np.isfinite(features.to_numpy(dtype=float)).all(axis=1)
-    X = features.loc[valid].copy()
-    y = s.loc[valid].copy()
-    return X, y
+    required = features.drop(columns=WEATHER_FEATURES, errors="ignore")
+    valid = s.notna() & np.isfinite(required.to_numpy(dtype=float)).all(axis=1)
+    return features.loc[valid].copy(), s.loc[valid].copy()
 
 
 class SafeLogTargetRegressor(RegressorMixin, BaseEstimator):
@@ -234,8 +253,8 @@ def build_models() -> dict[str, Any]:
     return models
 
 
-def tune_models(history: pd.Series) -> tuple[dict[str, Any], dict[str, Any]]:
-    X, y = make_supervised(history)
+def tune_models(history: pd.Series, weather: dict[str, pd.Series] | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
+    X, y = make_supervised(history, weather)
     if len(X) < MIN_TRAIN_ROWS:
         raise ValueError(f"Загварын tuning-д {len(X)} мөр байна. {MIN_TRAIN_ROWS}-аас дээш шаардлагатай.")
     n_splits = min(3, max(2, len(X) // 20))
@@ -276,8 +295,31 @@ def three_year_mean(history: pd.Series, date: pd.Timestamp) -> float:
     return float(recent.mean()) if len(recent) else seasonal_naive(history, date)
 
 
-def predict_one(model: Any, history: pd.Series, date: pd.Timestamp) -> float:
-    X = pd.DataFrame([feature_row(history, date)])
+def forecast_weather(history: pd.Series, date: pd.Timestamp, feature: str) -> float:
+    """Estimate future weather from prior same-calendar-month observations."""
+    recent = history.loc[(history.index < date) &
+                         (history.index >= date - pd.DateOffset(years=3)) &
+                         (history.index.month == date.month)].dropna()
+    if len(recent):
+        return float(recent.mean())
+    same_month = history.loc[(history.index < date) &
+                             (history.index.month == date.month)].dropna()
+    if len(same_month):
+        return float(same_month.mean())
+    valid = history.dropna()
+    return float(valid.median()) if len(valid) else 0.0
+
+
+def weather_at(weather: dict[str, pd.Series] | None, date: pd.Timestamp) -> dict[str, float]:
+    if not weather:
+        return {}
+    return {col: forecast_weather(series, date, col)
+            for col, series in weather.items()}
+
+
+def predict_one(model: Any, history: pd.Series, date: pd.Timestamp,
+                weather_values: dict[str, float] | None = None) -> float:
+    X = pd.DataFrame([feature_row(history, date, weather_values)])
     pred = float(np.asarray(model.predict(X)).reshape(-1)[0])
     if not np.isfinite(pred):
         raise ValueError(f"{date:%Y-%m}: загвар finite бус утга таамаглалаа.")
@@ -285,12 +327,13 @@ def predict_one(model: Any, history: pd.Series, date: pd.Timestamp) -> float:
 
 
 def recursive_forecast(method: str, template: Any | None, history: pd.Series,
-                        dates: pd.DatetimeIndex) -> list[float]:
-    """Fit once at the origin, then feed each prediction into the next forecast step."""
+                        dates: pd.DatetimeIndex,
+                        weather: dict[str, pd.Series] | None = None) -> list[float]:
+    """Fit once at origin and recursively feed target predictions forward."""
     working = history.copy().asfreq("MS")
     fitted = None
     if method not in BASELINES:
-        X, y = make_supervised(working)
+        X, y = make_supervised(working, weather)
         if len(X) < MIN_TRAIN_ROWS:
             raise ValueError(f"{method}: recursive origin-д сургалтын мөр хүрэлцэхгүй ({len(X)}).")
         fitted = clone(template).fit(X, y)
@@ -302,33 +345,35 @@ def recursive_forecast(method: str, template: Any | None, history: pd.Series,
             value = max(0.0, three_year_mean(working, date))
         else:
             assert fitted is not None
-            value = predict_one(fitted, working, date)
+            value = predict_one(fitted, working, date, weather_at(weather, date))
         out.append(value)
         working.loc[date] = value
     return out
 
 
 def one_step_rolling(series: pd.Series, dates: list[pd.Timestamp],
-                     templates: dict[str, Any]) -> tuple[dict[str, list[float]], list[float], list[pd.Timestamp]]:
+                     templates: dict[str, Any],
+                     weather: dict[str, pd.Series] | None = None
+                     ) -> tuple[dict[str, list[float]], list[float], list[pd.Timestamp]]:
     methods = list(templates) + list(BASELINES)
     predictions = {m: [] for m in methods}
     actuals: list[float] = []
     used_dates: list[pd.Timestamp] = []
     for date in dates:
         history = series.loc[series.index < date].asfreq("MS")
-        X, y = make_supervised(history)
+        past_weather = {k: v.loc[v.index < date] for k, v in (weather or {}).items()}
+        X, y = make_supervised(history, past_weather)
         if len(X) < MIN_TRAIN_ROWS:
             continue
         actual = series.get(date, np.nan)
         if pd.isna(actual):
             continue
-        actuals.append(float(actual))
-        used_dates.append(date)
-        x_test = pd.DataFrame([feature_row(history, date)])
+        actuals.append(float(actual)); used_dates.append(date)
+        weather_values = weather_at(past_weather, date)
+        x_test = pd.DataFrame([feature_row(history, date, weather_values)])
         for name, template in templates.items():
             model = clone(template).fit(X, y)
-            value = float(np.asarray(model.predict(x_test)).reshape(-1)[0])
-            predictions[name].append(max(0.0, value))
+            predictions[name].append(max(0.0, float(np.asarray(model.predict(x_test)).reshape(-1)[0])))
         predictions["seasonal_naive"].append(max(0.0, seasonal_naive(history, date)))
         predictions["three_year_seasonal_mean"].append(max(0.0, three_year_mean(history, date)))
     return predictions, actuals, used_dates
@@ -371,7 +416,7 @@ def choose_validation_origins(dev: pd.Series, horizon: int = HORIZON,
 
 def recursive_backtest(series: pd.Series, origins: list[pd.Timestamp],
                        templates: dict[str, Any], method_names: list[str] | None = None,
-                       horizon: int = HORIZON
+                       horizon: int = HORIZON, weather: dict[str, pd.Series] | None = None
                        ) -> dict[str, dict[int, list[tuple[pd.Timestamp, float, float]]]]:
     """Collect (target date, actual, prediction) by method and forecast horizon."""
     methods = method_names if method_names is not None else list(templates) + list(BASELINES)
@@ -381,7 +426,8 @@ def recursive_backtest(series: pd.Series, origins: list[pd.Timestamp],
         future = pd.date_range(origin + pd.offsets.MonthBegin(1), periods=horizon, freq="MS")
         actuals = series.reindex(future)
         for method in methods:
-            preds = recursive_forecast(method, templates.get(method), history, future)
+            weather_history = {k: v.loc[v.index <= origin] for k, v in (weather or {}).items()}
+            preds = recursive_forecast(method, templates.get(method), history, future, weather_history)
             for h, (date, pred) in enumerate(zip(future, preds), start=1):
                 actual = actuals.loc[date]
                 if pd.notna(actual):
@@ -487,7 +533,20 @@ def main() -> None:
     args.out.mkdir(parents=True, exist_ok=True); args.models_dir.mkdir(parents=True, exist_ok=True)
 
     df, source_units, audit = read_source(args.input, args.input_unit)
+    weather = {col: df[col].copy() for col in WEATHER_FEATURES if col in df.columns}
     df.to_csv(args.out / "clean_monthly_data.csv", encoding="utf-8-sig", index_label="month")
+    if weather:
+        weather_forecasts = []
+        temp_dates = pd.date_range(df.index.max() + pd.offsets.MonthBegin(1), periods=HORIZON, freq="MS")
+        for col, history in weather.items():
+            for d in temp_dates:
+                weather_forecasts.append({"month": d.strftime("%Y-%m-%d"), "feature": col,
+                                          "forecast_value": forecast_weather(history, d, col),
+                                          "method": "prior_three_year_same_month_mean"})
+        pd.DataFrame(weather_forecasts).to_csv(
+            args.out / "weather_forecast_12_months.csv", index=False, encoding="utf-8-sig")
+
+
     summary: dict[str, Any] = {
         "source_file": str(args.input), "source_units": source_units, "model_and_output_unit": "ug/m3",
         "monthly_data_audit": audit,
@@ -504,7 +563,10 @@ def main() -> None:
             "units": "All calculations/outputs are ug/m3; 1 mg/m3 = 1000 ug/m3. Auto unit detection is a scale heuristic, not proof of source units.",
             "MAPE": "MAPE excludes near-zero actual values; interpret MAE, RMSE, sMAPE and WAPE alongside it.",
         },
-        "weather_features_used": False,
+        "weather_features_used": bool(weather),
+        "weather_feature_method": "Historical weather covariates are used when available; future values are estimated from prior same-calendar-month observations (up to three years). Future observed weather is never used in forecasts.",
+            "weather_features": list(weather.keys()),
+            "weather_units_note": "Temperature is assumed °C; max wind speed and precipitation units must be verified from source metadata. Missing weather values are imputed inside model pipelines using training-fold medians.",
     }
 
     metric_rows: list[dict[str, Any]] = []
@@ -558,13 +620,13 @@ def main() -> None:
         first_origin = selection_origins[0]
         tuning_history = dev.loc[dev.index <= first_origin]
         # Tuning history ends at first origin. The origin itself is used only as the training endpoint.
-        templates, tuning_info = tune_models(tuning_history)
+        templates, tuning_info = tune_models(tuning_history, weather)
         print(f"[{target}] tuning дууслаа; models={len(templates)}", flush=True)
         methods = list(templates) + list(BASELINES)
 
         # Model selection: multiple earlier rolling origins. The primary score is
         # mean origin-level MAE, so each origin contributes equally despite gaps.
-        recursive_val = recursive_backtest(dev, selection_origins, templates, horizon=HORIZON)
+        recursive_val = recursive_backtest(dev, selection_origins, templates, horizon=HORIZON, weather=weather)
         recursive_val_metrics: dict[str, dict[str, Any]] = {}
         for method in methods:
             actuals, preds = flatten_recursive(recursive_val[method])
@@ -614,13 +676,13 @@ def main() -> None:
 
         # One-step rolling validation, reported separately (not used as the primary selector).
         one_step_val_dates = list(pd.date_range(max(origins[0] + pd.offsets.MonthBegin(1), dev.index.max() - pd.DateOffset(months=5)), dev.index.max(), freq="MS"))
-        one_val_preds, one_val_actuals, one_val_dates_used = one_step_rolling(dev, one_step_val_dates, templates)
+        one_val_preds, one_val_actuals, one_val_dates_used = one_step_rolling(dev, one_step_val_dates, templates, weather)
         for method in methods:
             metric_rows.append({"target": target, "method": method, "evaluation": "validation_one_step",
                                 "horizon": 1, **metric_pack(one_val_actuals, one_val_preds[method])})
 
         # Final one-step holdout: refit at each month using only earlier observations.
-        one_holdout_preds, one_holdout_actuals, one_holdout_dates_used = one_step_rolling(series, list(holdout_dates), templates)
+        one_holdout_preds, one_holdout_actuals, one_holdout_dates_used = one_step_rolling(series, list(holdout_dates), templates, weather)
         print(f"[{target}] one-step holdout дууслаа", flush=True)
         for method in methods:
             metric_rows.append({"target": target, "method": method, "evaluation": "final_holdout_one_step",
@@ -633,7 +695,8 @@ def main() -> None:
         final_recursive_preds: dict[str, list[float]] = {}
         final_actuals = series.reindex(final_future)
         for method in methods:
-            final_recursive_preds[method] = recursive_forecast(method, templates.get(method), final_history, final_future)
+            final_recursive_preds[method] = recursive_forecast(method, templates.get(method), final_history, final_future,
+                               {k: v.loc[v.index <= final_origin] for k, v in weather.items()})
             valid_dates = final_actuals.dropna().index
             actuals = [float(final_actuals.loc[d]) for d in valid_dates]
             # Use exact month-to-position mapping; do not assume every month has identical day count.
@@ -651,7 +714,7 @@ def main() -> None:
         # Each horizon is calibrated only from errors at that exact horizon.
         calibration_val = recursive_backtest(
             dev, calibration_origins, templates,
-            method_names=[best_method], horizon=calibration_horizon
+            method_names=[best_method], horizon=calibration_horizon, weather=weather
         ) if calibration_origins else {best_method: {h: [] for h in range(1, calibration_horizon + 1)}}
         print(f"[{target}] calibration дууслаа", flush=True)
         interval_radii: list[float] = []
@@ -691,7 +754,7 @@ def main() -> None:
         # months first; do not publish stale forecasts for months already passed.
         recursive_dates = bridge_dates.append(full_future) if len(bridge_dates) else full_future
         full_models: dict[str, Any] = {}
-        X_full, y_full = make_supervised(series)
+        X_full, y_full = make_supervised(series, weather)
         for name, template in templates.items():
             fitted = clone(template).fit(X_full, y_full)
             full_models[name] = fitted
@@ -699,9 +762,9 @@ def main() -> None:
         future_scenarios: dict[str, list[float]] = {}
         for method in methods:
             if method in BASELINES:
-                all_preds = recursive_forecast(method, None, series, recursive_dates)
+                all_preds = recursive_forecast(method, None, series, recursive_dates, weather)
             else:
-                all_preds = recursive_forecast(method, full_models[method], series, recursive_dates)
+                all_preds = recursive_forecast(method, full_models[method], series, recursive_dates, weather)
             future_scenarios[method] = all_preds[bridge_month_count:]
             for bridge_i, bridge_date in enumerate(bridge_dates):
                 bridge_rows.append({"month": bridge_date.strftime("%Y-%m-%d"), "target": target,
